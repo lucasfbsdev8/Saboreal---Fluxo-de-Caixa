@@ -1,15 +1,30 @@
-<!DOCTYPE html>
-<html>
-<head>
-  <link rel="stylesheet" href="https://pyscript.net/releases/2024.11.1/core.css">
-  <script type="module" src="https://pyscript.net/releases/2024.11.1/core.js"></script>
-</head>
-<body>
-  <script type="py">
-    from pyscript import display
+pessoais = open('pessoais.html','w')
+nome = input("Nome:")
+idade = input("Idade:")
+endereço = input("Endereço:")
+email = input("Email:")
+telefone = input("Telefone:")
+pessoais.write('nome: ' + nome + '\n' + 'idade: ' + idade + '\n' + 'endereço: ' + endereço + '\n' + 'email: ' + email + '\n' + 'telefone: ' + telefone + '\n')
+pessoais.close()
 
-    nome = "mundo"
-    display(f"Olá, {nome}! Isso é Python no HTML.")
-  </script>
-</body>
-</html>
+arquivo = open("profissional.html", "w")
+curso = input("Curso: ")
+cursando = input("Ainda está cursando? (S/N): ")
+if cursando.upper() == "S":
+    situacao = input("Qual período você está cursando? ")
+else:
+    situacao = "Concluido"
+experiencia = input("Experiência profissional: ")
+arquivo.write("Curso: " + curso + "\n")
+arquivo.write("Situação: " + situacao + "\n")
+arquivo.write("Experiência: " + experiencia + "\n")
+arquivo.close()
+
+idiomas = open('idiomas.html','w')
+resposta = 'S'
+while resposta.upper() == 'S':
+    idioma = input("Digite o idioma que você fala:")
+    idiomas.write("Idiomas: " + idioma + "\n")
+    resposta = input("Deseja incluir mais idiomas S/N?")
+idiomas.close()
+
