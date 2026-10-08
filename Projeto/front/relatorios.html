@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Tela relatório</title>
+    <title>Tela relatórios</title>
 
   <style>
     body {
@@ -11,11 +11,16 @@
       font-family: arial, sans-serif;
     }
 
+    .principal {
+        display: flex;
+        width: 100%
+    }
+
     /* A barra marrom */
     .menu {
       background-color: #5D4D3F;
       color: #E9E9E9;
-      width: 280px;          /* largura da barra */
+      width: 20%;          /* largura da barra */
       height: 100vh;         /* ocupa a altura toda da tela */
       padding: 15px;
       box-sizing: border-box;
@@ -62,26 +67,40 @@
       left: 15px;
       right: 15px;
     }
+
+    /* Fundo resto da tela */
+    .fundo {
+      background-color: #EBEBEB;
+      color:black;
+      width: 80%;         
+      height: 100vh;       
+      padding: 15px;
+      box-sizing: border-box;
+      position: relative;  
+    }
   </style>
 </head>
 <body>
+  <div class="principal">
+    <div class="menu">
 
-  <div class="menu">
+        <div class="logo">
+        SABOREAL
+        <small>BISCOITOS CASEIROS</small>
+        </div>
 
-    <div class="logo">
-      SABOREAL
-      <small>BISCOITOS CASEIROS</small>
+        <a href="#">🏠 Início</a>
+        <a href="#">💰 Caixa</a>
+        <a href="#">🛒 Vendas</a>
+        <a href="#">📝 Cadastro</a>
+        <a href="#" class="ativo">📦 Relatórios</a>
+
+        <a href="#" class="sair">➡️ Sair</a>
+
     </div>
-
-    <a href="#">🏠 Início</a>
-    <a href="#">💰 Caixa</a>
-    <a href="#">🛒 Vendas</a>
-    <a href="#">📝 Cadastro</a>
-    <a href="#" class="ativo">📦 Relatórios</a>
-
-    <a href="#" class="sair">➡️ Sair</a>
-
+    <div class="fundo">
+        OI
+    </div>
   </div>
-
 </body>
 </html>
