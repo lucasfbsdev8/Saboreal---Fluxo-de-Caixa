@@ -1,11 +1,88 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="pt-BR">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tela vendas</title>
+
+  <style>
+    /* Tira os espaços padrão do navegador */
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+    }
+
+    /* A barra marrom */
+    .menu {
+      background-color: #5f4b3b;
+      color: white;
+      width: 260px;          /* largura da barra */
+      height: 100vh;         /* ocupa a altura toda da tela */
+      padding: 15px;
+      box-sizing: border-box;
+      position: relative;    /* necessário para o "Sair" ficar embaixo */
+    }
+
+    /* Nome da padaria */
+    .logo {
+      text-align: center;
+      font-size: 28px;
+      margin-bottom: 30px;
+    }
+
+    .logo small {
+      display: block;
+      font-size: 10px;
+    }
+
+    /* Cada botão do menu */
+    .menu a {
+      display: block;
+      color: white;
+      text-decoration: none;   /* tira o sublinhado */
+      padding: 10px;
+      margin-bottom: 10px;
+      border-radius: 6px;
+      font-size: 16px;
+    }
+
+    /* Botão da página atual (vermelho) */
+    .menu a.ativo {
+      background-color: #b3261e;
+    }
+
+    /* Muda a cor quando passa o mouse */
+    .menu a:hover {
+      background-color: #7a6451;
+    }
+
+    /* Botão Sair: fica fixo no fim da barra */
+    .menu a.sair {
+      position: absolute;
+      bottom: 15px;    /* distância até o fim da tela */
+      left: 15px;
+      right: 15px;
+    }
+  </style>
 </head>
 <body>
-    
+
+  <div class="menu">
+
+    <div class="logo">
+      SABOREAL
+      <small>BISCOITOS CASEIROS</small>
+    </div>
+
+    <a href="#">🏠 Início</a>
+    <a href="#">💰 Caixa</a>
+    <a href="#" class="ativo">🛒 Vendas</a>
+    <a href="#">📝 Cadastro</a>
+    <a href="#">📦 Relatórios</a>
+
+    <a href="#" class="sair">➡️ Sair</a>
+
+  </div>
+
 </body>
 </html>
