@@ -1,8 +1,6 @@
-const links = document.querySelectorAll(".menu a");
-
-links.forEach(function (link) {
+document.querySelectorAll(".menu a").forEach(function (link) {
   link.addEventListener("click", function (event) {
-    event.preventDefault(); // impede o "#" de rolar a página
+    event.preventDefault();
     window.location.href = link.dataset.pagina;
   });
 });
