@@ -62,11 +62,29 @@
 
     /* Fundo resto da tela */
     .fundo {
+      display: flex;
+      justify-content: space-between;
+      gap: 30px;
       background-color: #EBEBEB;
       color:black;
-      width: 80%;          /* largura da barra */
-      height: 100vh;        /* ocupa a altura toda da tela */
+      width: 80%;          
+      height: 100vh;        
       padding: 15px;
       box-sizing: border-box;
       position: relative;  
+    }
+    .quadrados {
+      display: block;
+      color: #5D4D3F;
+      gap: 16px;
+      width: 100%;
+      line-height: 1.0;
+      text-align: justify;
+      background-color: #B4AF96;
+      text-decoration: none; 
+      padding: 90px;
+      margin-top: 150px;
+      margin-bottom: 300px;
+      border-radius: 50px;
+      font-size: 12px;
     }
