@@ -1,72 +1,110 @@
-    body {
-      margin: 0;
-      font-family: arial, sans-serif;
-    }
+body {
+  margin: 0;
+  font-family: arial, sans-serif;
+}
+ 
+.principal {
+  display: flex;
+  width: 100%;
+}
 
-    .principal {
-        display: flex;
-        width: 100%
-    }
+.sidebar {
+  background-color: #5D4D3F;
+  color: #E9E9E9;
+  width: 20%;
+  height: 100vh;
+  padding: 15px;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+}
 
-    /* A barra marrom */
-    .menu {
-      background-color: #5D4D3F;
-      color: #E9E9E9;
-      width: 20%;          /* largura da barra */
-      height: 100vh;         /* ocupa a altura toda da tela */
-      padding: 15px;
-      box-sizing: border-box;
-      position: relative;    /* necessário para o "Sair" ficar embaixo */
-    }
+.logo {
+  display: flex;
+  text-align: center;
+  justify-content: center;
+  gap: 10px;
+  margin-bottom: 30px;
+}
 
-    /* Nome da padaria */
-    .logo {
-      text-align: center;
-      font-size: 28px;
-      margin-bottom: 30px;
-    }
-
-    .logo small {
-      display: block;
-      font-size: 10px;
-    }
-
-    /* Cada botão do menu */
-    .menu a {
-      display: block;
-      color: #E9E9E9;
-      text-decoration: none;  
-      padding: 20px;
-      margin-bottom: 10px;
-      border-radius: 6px;
-      font-size: 16px;
-    }
-
-    /* Botão da página atual (vermelho) */
-    .menu a.ativo {
-      background-color: #E11212;
-    }
-
-    /* Muda a cor quando passa o mouse */
-    .menu a:hover {
-      background-color: #B4AF96;
-    }
-
-    /* Botão Sair: fica no fim da barra */
-    .menu a.sair {
-      position: absolute;
-      bottom: 15px;    
-      left: 15px;
-      right: 15px;
-    }
-
-    /* Fundo resto da tela */
-    .fundo {
-      background-color: #EBEBEB;
-      color:black;
-      width: 80%;          /* largura da barra */
-      height: 100vh;        /* ocupa a altura toda da tela */
-      padding: 15px;
-      box-sizing: border-box;
-      position: relative;  
-    }
+.logo-icone { width: 28%; }
+.logo-escrita { width: 65%; }
+ 
+.sidebar a {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  color: #E9E9E9;
+  text-decoration: none;
+  padding: 16px 20px;
+  margin-bottom: 8px;
+  border-radius: 6px;
+  font-size: 16px;
+}
+ 
+.sidebar a:hover { background-color: #AC2A24; }
+.sidebar a.ativo { background-color: #AC2A24; }
+ 
+.icone {
+  width: 22px;
+  height: 22px;
+  flex-shrink: 0;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+ 
+.submenu {
+  display: none;
+  margin: -2px 0 10px 32px;
+  border-left: 2px solid #AC2A24;
+}
+.grupo.aberto .submenu { display: block; }
+ 
+.sidebar .submenu a {
+  padding: 10px 16px;
+  margin-bottom: 2px;
+  font-size: 14px;
+}
+.sidebar .submenu a.ativo {
+  background-color: #AC2A24;
+  color: #FFF;
+  font-weight: bold;
+}
+ 
+.sidebar a.sair { margin-top: auto; }
+ 
+.fundo {
+  background-color: #EBEBEB;
+  color: black;
+  width: 80%;
+  height: 100vh;
+  padding: 15px 25px;
+  box-sizing: border-box;
+  overflow-y: auto;
+}
+ 
+.topo {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+.topo h1 { font-size: 24px; margin: 0; }
+.usuario { font-size: 14px; }
+ 
+.cards { display: flex; gap: 15px; }
+.card {
+  flex: 1;
+  background-color: #B4AF96;
+  border-radius: 8px;
+  padding: 15px;
+}
+.card small { display: block; margin-bottom: 6px; }
+.card strong { font-size: 22px; }
+ 
+.secao { display: none; }
+.secao.visivel { display: block; } 
