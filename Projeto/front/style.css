@@ -212,15 +212,25 @@ body {
   height: 32px;
 }
  
-.cards { display: flex; gap: 15px; }
+.cards { display: flex; gap: 30px; }
 .card {
   flex: 1;
   background-color: #B4AF96;
   border-radius: 8px;
-  padding: 15px;
+  padding: 20px;
 }
 .card small { display: block; margin-bottom: 6px; }
 .card strong { font-size: 22px; }
  
 .secao { display: none; }
 .secao.visivel { display: block; } 
+
+.grafico {
+  display:flex;
+  background-color: #B4AF96;
+  border-radius: 8px;
+  padding:20px;
+  margin-top: 50px;
+  height:300px;
+}
+.grafico strong {font-size:22px}
