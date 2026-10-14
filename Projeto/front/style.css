@@ -2,6 +2,110 @@ body {
   margin: 0;
   font-family: arial, sans-serif;
 }
+
+.login {
+  display: flex;
+  height: 100vh;
+}
+
+.login-foto {
+  position: relative;
+  width: 65%;
+  background-image:
+    linear-gradient(to bottom, rgba(255,255,255,0) 45%, rgba(255,255,255,0.9) 100%),
+    url("imagens/fundo.png");
+  background-size: cover;
+  background-position: center;
+}
+
+.login-escrita {
+  position: absolute;
+  top: 30px;
+  left: 625px;
+  width: 60%;
+  max-width: 420px;
+}
+ 
+.login-subtitulo {
+  position: absolute;
+  bottom: -20px;
+  left: 520px;
+  margin: 0;
+  font-size: 70px;
+  height: 170px;
+  color: #5D4D3F;
+}
+
+.login-painel {
+  width: 35%;
+  background-color: #5D4D3F;
+  color: #E9E9E9;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 30px;
+  box-sizing: border-box;
+}
+ 
+.login-titulo {
+  font-size: 28px;
+  margin: 0 0 20px;
+  margin-bottom: 20px;
+}
+ 
+.login-logo {
+  width: 90px;
+  margin-bottom: 30px;
+}
+ 
+.login-form {
+  width: 100%;
+  max-width: 300px;
+}
+ 
+.login-campo {
+  position: relative;
+  margin-bottom: 15px;
+}
+ 
+.login-campo .icone {
+  position: absolute;
+  left: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 20px;
+  height: 20px;
+  fill: none;
+  stroke: #5D4D3F;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+ 
+.login-campo input {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 12px 12px 12px 42px;
+  border: none;
+  border-radius: 8px;
+  background-color: #EBEBEB;
+  font-size: 15px;
+}
+ 
+.login-botao {
+  width: 100%;
+  padding: 12px;
+  margin-top: 10px;
+  border: none;
+  border-radius: 8px;
+  background-color: #AC2A24;
+  color: #FFF;
+  font-size: 16px;
+  font-weight: bold;
+  cursor: pointer;
+}
+.login-botao:hover { background-color: #8F2420; }
  
 .principal {
   display: flex;
@@ -93,8 +197,20 @@ body {
   align-items: center;
   margin-bottom: 20px;
 }
+
 .topo h1 { font-size: 24px; margin: 0; }
-.usuario { font-size: 14px; }
+
+.usuario {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 14px;
+}
+
+.usuario .icone {
+  width: 32px;
+  height: 32px;
+}
  
 .cards { display: flex; gap: 15px; }
 .card {
