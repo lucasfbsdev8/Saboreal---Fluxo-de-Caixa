@@ -212,15 +212,15 @@ body {
   height: 32px;
 }
  /*TELA INICIO */
-.cards { display: flex; gap: 30px; }
+.cards { display: flex; gap: 40px; }
 .card {
   flex: 1;
   background-color: #B4AF96;
   border-radius: 8px;
-  padding: 20px;
+  padding: 35px;
 }
-.card small { display: block; margin-bottom: 6px; }
-.card strong { font-size: 22px; }
+.card small { display: block; margin-bottom: 6px; font-size:25px; }
+.card strong { font-size: 27px; }
  
 .secao { display: none; }
 .secao.visivel { display: block; } 
