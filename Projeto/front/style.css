@@ -211,7 +211,7 @@ body {
   width: 32px;
   height: 32px;
 }
- 
+ /*TELA INICIO */
 .cards { display: flex; gap: 30px; }
 .card {
   flex: 1;
@@ -234,3 +234,14 @@ body {
   height:300px;
 }
 .grafico strong {font-size:22px}
+
+/*TELA CADASTRO */
+.produto {
+  display:flex;
+  background-color: #B4AF96;
+  border-radius:8px;
+  padding:30px;
+  margin-top:20px;
+  height: 450px;
+  width: 260px
+}
