@@ -238,10 +238,34 @@ body {
 /*TELA CADASTRO */
 .produto {
   display:flex;
+  flex-direction: column;
   background-color: #B4AF96;
   border-radius:8px;
   padding:30px;
-  margin-top:20px;
   height: 450px;
-  width: 260px
+  width: 260px;
+  gap:10px;
 }
+.produto strong { font-size:22px;}
+.produto small {font-size:13px;}
+
+.cadastro {
+  background-color: #FFFFFF;
+  border-radius:6px;
+  padding: 7px;
+  margin-top:5px;
+  height: 25px;
+  align-items: center;
+}
+.cadastro small {opacity:70%; color:black;}
+
+.subcadastro {
+  background-color: #FFFFFF;
+  border-radius:6px;
+  padding: 7px;
+  margin-top:5px;
+  height: 25px;
+  width: 100px;
+  align-items: center;
+}
+.subcadastro strong { font-size:13px;}
