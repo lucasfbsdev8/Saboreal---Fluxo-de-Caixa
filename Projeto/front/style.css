@@ -237,8 +237,7 @@ body {
 
 /*TELA CADASTRO */
 .produto {
-  display:flex;
-  flex-direction: column;
+  display:inline-block;
   background-color: #B4AF96;
   border-radius:8px;
   padding:30px;
@@ -251,21 +250,37 @@ body {
 
 .cadastro {
   background-color: #FFFFFF;
-  border-radius:6px;
+  border-radius:8px;
   padding: 7px;
   margin-top:5px;
   height: 25px;
   align-items: center;
 }
-.cadastro small {opacity:70%; color:black;}
+.cadastro small {opacity:70%; color:black; font-size:16px;}
+.cadastro strong {font-size:16px;}
 
 .subcadastro {
+  display:inline-block;
   background-color: #FFFFFF;
-  border-radius:6px;
-  padding: 7px;
+  border-radius:8px;
+  padding:8px;
   margin-top:5px;
   height: 25px;
   width: 100px;
   align-items: center;
 }
-.subcadastro strong { font-size:13px;}
+.subcadastro strong { font-size:16px;}
+.subcadastro + .subcadastro {margin-left: 22px;}
+
+.salvar {
+  display: flex;
+  background-color: #E11212;
+  color:white;
+  border-radius:8px;
+  margin: 0 auto;
+  height: 25px;
+  width:150px;
+  justify-content: center;
+  align-items: center;
+}
+.salvar strong {font-size:16px;}
