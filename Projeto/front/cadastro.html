@@ -1,80 +1,72 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Cadastro - Saboreal</title>
-  <link rel="stylesheet" href="style.css">
-  <link rel="icon" href="imagens/icone.png">
+    <meta charset="UTF-8">
+    <title>Cadastro - SABOREAL</title>
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <div class="principal">
-    <nav class="sidebar">
-      <div class="logo">
-        <img class="logo-icone" src="imagens/logo.png" alt="Logo - Saboreal Biscoitos Caseiros">
-        <img class="logo-escrita" src="imagens/logoEscrita.png" alt="Escrita - Saboreal Biscoitos Caseiros">
-      </div>
- 
-      <a href="inicio.html"><svg class="icone" viewBox="0 0 24 24"><path d="M15 21v-8a1 1 0 0 0-1-1h-4a1 1 0 0 0-1 1v8"/><path d="M3 10a2 2 0 0 1 .709-1.528l7-5.999a2 2 0 0 1 2.582 0l7 5.999A2 2 0 0 1 21 10v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg> Início</a>
- 
-      <div class="grupo">
-        <a href="caixa.html"><svg class="icone" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M16 8h-6a2 2 0 1 0 0 4h4a2 2 0 1 1 0 4H8"/><path d="M12 18V6"/></svg> Caixa</a>
-        <div class="submenu">
-          <a href="#" data-secao="abrir-caixa">Abrir caixa</a>
-          <a href="#" data-secao="fechar-caixa">Fechar caixa</a>
-          <a href="#" data-secao="fluxo-caixa">Fluxo de caixa</a>
+    <div class="app-container">
+        <div id="sidebar-container"></div>
+        <div class="main-content">
+            <div class="top-bar">
+                <h2>Cadastro de produtos</h2>
+                <div class="user-info">👤 Gerência</div>
+            </div>
+            <div class="page-body">
+                <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 20px;">
+                    <div>
+                        <table class="table-custom">
+                            <thead>
+                                <tr><th>Cód.</th><th>Produto</th><th>Categoria</th><th>Preço</th><th>Estoque</th><th>Status</th></tr>
+                            </thead>
+                            <tbody id="tb-produtos"></tbody>
+                        </table>
+                    </div>
+
+                    <div class="card-panel">
+                        <h3>Novo produto</h3>
+                        <form id="form-produto" style="margin-top: 10px;">
+                            <div class="form-group"><label>Código</label><input type="text" id="p-cod" class="form-control" required></div>
+                            <div class="form-group"><label>Nome</label><input type="text" id="p-nome" class="form-control" required></div>
+                            <div class="form-group"><label>Categoria</label><input type="text" id="p-cat" class="form-control" required></div>
+                            <div class="form-group"><label>Preço de venda</label><input type="number" step="0.01" id="p-preco" class="form-control" required></div>
+                            <div class="form-group"><label>Estoque</label><input type="number" id="p-estoque" class="form-control" required></div>
+                            <button type="submit" class="btn-primary" style="width: 100%;">Salvar produto</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
         </div>
-      </div>
- 
-      <div class="grupo">
-        <a href="vendas.html"><svg class="icone" viewBox="0 0 24 24"><circle cx="8" cy="21" r="1"/><circle cx="19" cy="21" r="1"/><path d="M2.05 2.05h2l2.66 12.42a2 2 0 0 0 2 1.58h9.78a2 2 0 0 0 1.95-1.57l1.65-7.43H5.12"/></svg> Vendas</a>
-        <div class="submenu">
-          <a href="#" data-secao="entradas">Entradas</a>
-          <a href="#" data-secao="saidas">Saídas</a>
-        </div>
-      </div>
- 
-      <a href="cadastro.html"><svg class="icone" viewBox="0 0 24 24"><path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"/><path d="M14 2v4a2 2 0 0 0 2 2h4"/><path d="M12 12v6"/><path d="M9 15h6"/></svg> Cadastro</a>
- 
-      <div class="grupo">
-        <a href="relatorios.html"><svg class="icone" viewBox="0 0 24 24"><path d="M3 3v18h18"/><path d="M18 17V9"/><path d="M13 17V5"/><path d="M8 17v-3"/></svg> Relatórios</a>
-        <div class="submenu">
-          <a href="#" data-secao="dashboard">Dashboard</a>
-          <a href="#" data-secao="historico-vendas">Histórico de vendas</a>
-        </div>
-      </div>
- 
-      <a href="login.html" class="sair"><svg class="icone" viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" x2="9" y1="12" y2="12"/></svg> Sair</a>
-    </nav>
- 
-    <main class="fundo">
-      <header class="topo">
-        <h1>Cadastro</h1>
-        <span class="usuario">
-          <svg class="icone" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="10" r="3"/><path d="M7 20.662V19a2 2 0 0 1 2-2h6a2 2 0 0 1 2 2v1.662"/></svg>
-          Gerência
-        </span>
-      </header>
-      <div class="produto">
-        <strong>Novo Produto</strong><br><br>
-        <small>Nome do Produto</small>
-        <div class="cadastro">
-          <small>Ex: Bolo de Maracujá</small>
-        </div><br>
-        <small>Código</small><br>
-        <div class="subcadastro"><strong>06</strong></div>
-        <div class="subcadastro"><strong>Biscoitos</strong></div><br><br>     
-        <small>Preço de Venda</small><br>
-        <div class="subcadastro"><strong>R$ 0,00</strong></div>
-        <div class="subcadastro"><strong>Unidade</strong></div><br><br>
-        <small>Custo(opcional)</small><br>
-        <div class="subcadastro"><strong>R$ 0,00</strong></div>
-        <div class="subcadastro"><strong>0</strong></div><br><br>
-        <div class="cadastro"><strong>Produto ativo</strong></div><br>
-        <div class="salvar"><strong>Salvar Produto</strong></div>
-      </div>
-    </main>
-  </div>
-  <script src="menu.js"></script>
+    </div>
+    <script src="api.js"></script>
+    <script src="sidebar.js"></script>
+    <script>
+        async function carregarProdutos() {
+            const prods = await apiRequest('/produtos') || [];
+            const tbody = document.getElementById('tb-produtos');
+            tbody.innerHTML = '';
+            prods.forEach(p => {
+                tbody.innerHTML += `<tr><td>${p.codigo}</td><td>${p.nome}</td><td>${p.categoria}</td><td>R$ ${p.preco_venda.toFixed(2)}</td><td>${p.estoque}</td><td><span class="status-badge">${p.status}</span></td></tr>`;
+            });
+        }
+
+        document.getElementById('form-produto').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const res = await apiRequest('/produtos', 'POST', {
+                codigo: document.getElementById('p-cod').value,
+                nome: document.getElementById('p-nome').value,
+                categoria: document.getElementById('p-cat').value,
+                preco_venda: parseFloat(document.getElementById('p-preco').value),
+                estoque: parseInt(document.getElementById('p-estoque').value)
+            });
+            if (res && res.sucesso) {
+                alert('Produto cadastrado!');
+                carregarProdutos();
+            }
+        });
+
+        document.addEventListener('DOMContentLoaded', carregarProdutos);
+    </script>
 </body>
 </html>
