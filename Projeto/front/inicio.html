@@ -1,70 +1,52 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Início - Saboreal</title>
-  <link rel="stylesheet" href="style.css">
-  <link rel="icon" href="imagens/icone.png">
+    <meta charset="UTF-8">
+    <title>Início - SABOREAL</title>
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <div class="principal">
-    <nav class="sidebar">
-      <div class="logo">
-        <img class="logo-icone" src="imagens/logo.png" alt="Logo - Saboreal Biscoitos Caseiros">
-        <img class="logo-escrita" src="imagens/logoEscrita.png" alt="Escrita - Saboreal Biscoitos Caseiros">
-      </div>
- 
-      <a href="inicio.html"><svg class="icone" viewBox="0 0 24 24"><path d="M15 21v-8a1 1 0 0 0-1-1h-4a1 1 0 0 0-1 1v8"/><path d="M3 10a2 2 0 0 1 .709-1.528l7-5.999a2 2 0 0 1 2.582 0l7 5.999A2 2 0 0 1 21 10v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg> Início</a>
- 
-      <div class="grupo">
-        <a href="caixa.html"><svg class="icone" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M16 8h-6a2 2 0 1 0 0 4h4a2 2 0 1 1 0 4H8"/><path d="M12 18V6"/></svg> Caixa</a>
-        <div class="submenu">
-          <a href="#" data-secao="abrir-caixa">Abrir caixa</a>
-          <a href="#" data-secao="fechar-caixa">Fechar caixa</a>
-          <a href="#" data-secao="fluxo-caixa">Fluxo de caixa</a>
+    <div class="app-container">
+        <div id="sidebar-container"></div>
+        <div class="main-content">
+            <div class="top-bar">
+                <h2>Início</h2>
+                <div class="user-info">👤 <span id="lbl-usuario">Gerência</span></div>
+            </div>
+            <div class="page-body">
+                <p style="margin-bottom: 20px;">Olá, aqui está o resumo de hoje.</p>
+                <div class="cards-grid">
+                    <div class="metric-card">
+                        <h4>Faturamento hoje</h4>
+                        <div class="value" id="val-faturamento">R$ 0,00</div>
+                        <div class="subtext">em relação a ontem</div>
+                    </div>
+                    <div class="metric-card">
+                        <h4>Vendas hoje</h4>
+                        <div class="value" id="val-vendas">0 vendas</div>
+                        <div class="subtext" style="color: #D9534F;">em relação a ontem</div>
+                    </div>
+                    <div class="metric-card">
+                        <h4>Dinheiro em caixa</h4>
+                        <div class="value" id="val-caixa">R$ 0,00</div>
+                        <div class="subtext">em relação ao mês passado</div>
+                    </div>
+                </div>
+            </div>
         </div>
-      </div>
- 
-      <div class="grupo">
-        <a href="vendas.html"><svg class="icone" viewBox="0 0 24 24"><circle cx="8" cy="21" r="1"/><circle cx="19" cy="21" r="1"/><path d="M2.05 2.05h2l2.66 12.42a2 2 0 0 0 2 1.58h9.78a2 2 0 0 0 1.95-1.57l1.65-7.43H5.12"/></svg> Vendas</a>
-        <div class="submenu">
-          <a href="#" data-secao="entradas">Entradas</a>
-          <a href="#" data-secao="saidas">Saídas</a>
-        </div>
-      </div>
- 
-      <a href="cadastro.html"><svg class="icone" viewBox="0 0 24 24"><path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"/><path d="M14 2v4a2 2 0 0 0 2 2h4"/><path d="M12 12v6"/><path d="M9 15h6"/></svg> Cadastro</a>
- 
-      <div class="grupo">
-        <a href="relatorios.html"><svg class="icone" viewBox="0 0 24 24"><path d="M3 3v18h18"/><path d="M18 17V9"/><path d="M13 17V5"/><path d="M8 17v-3"/></svg> Relatórios</a>
-        <div class="submenu">
-          <a href="#" data-secao="dashboard">Dashboard</a>
-          <a href="#" data-secao="historico-vendas">Histórico de vendas</a>
-        </div>
-      </div>
- 
-      <a href="login.html" class="sair"><svg class="icone" viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" x2="9" y1="12" y2="12"/></svg> Sair</a>
-    </nav>
- 
-    <main class="fundo">
-      <header class="topo">
-        <h1>Aqui está o resumo da padaria hoje:</h1>
-        <span class="usuario">
-          <svg class="icone" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="10" r="3"/><path d="M7 20.662V19a2 2 0 0 1 2-2h6a2 2 0 0 1 2 2v1.662"/></svg>
-          Gerência
-        </span>
-      </header>
-      <div class="cards">
-        <div class="card"><small>Faturamento hoje</small><strong>R$ 512,00</strong></div>
-        <div class="card"><small>Vendas hoje</small><strong>38 vendas</strong></div>
-        <div class="card"><small>Dinheiro em caixa</small><strong>R$ 170,00</strong></div>
-      </div>
-      <div class="grafico">
-        <strong>Vendas Hoje</strong>
-      </div>
-    </main>
-  </div>
-  <script src="menu.js"></script>
+    </div>
+
+    <script src="api.js"></script>
+    <script src="sidebar.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', async () => {
+            const res = await apiRequest('/dashboard/resumo');
+            if (res) {
+                document.getElementById('val-faturamento').textContent = `R$ ${res.faturamento_hoje.toFixed(2)}`;
+                document.getElementById('val-vendas').textContent = `${res.vendas_hoje} vendas`;
+                document.getElementById('val-caixa').textContent = `R$ ${res.dinheiro_caixa.toFixed(2)}`;
+            }
+        });
+    </script>
 </body>
 </html>
