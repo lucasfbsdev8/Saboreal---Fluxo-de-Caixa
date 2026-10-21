@@ -1,70 +1,306 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Vendas - Saboreal</title>
-  <link rel="stylesheet" href="style.css">
-  <link rel="icon" href="imagens/icone.png">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vendas (PDV) - SABOREAL</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        .pos-container {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 20px;
+            height: calc(100vh - 120px);
+        }
+
+        /* Lado Esquerdo: Grid de Produtos */
+        .pos-products-section {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .search-bar-container {
+            display: flex;
+            gap: 10px;
+        }
+
+        .products-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+            gap: 15px;
+            overflow-y: auto;
+            padding-right: 5px;
+            max-height: calc(100vh - 180px);
+        }
+
+        .product-card {
+            background-color: #FFF;
+            border-radius: 10px;
+            padding: 15px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            align-items: center;
+            text-align: center;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+            border: 1px solid #E0E0E0;
+            transition: transform 0.15s, box-shadow 0.15s;
+            cursor: pointer;
+        }
+
+        .product-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+        }
+
+        .product-card img {
+            width: 55px;
+            height: 55px;
+            object-fit: contain;
+            margin-bottom: 10px;
+        }
+
+        .product-card h4 {
+            font-size: 0.95rem;
+            color: #3E2723;
+            margin-bottom: 4px;
+        }
+
+        .product-card .price {
+            font-weight: bold;
+            color: #2E7D32;
+            font-size: 1.1rem;
+            margin-bottom: 8px;
+        }
+
+        .product-card .stock-tag {
+            font-size: 0.75rem;
+            color: #757575;
+            margin-bottom: 10px;
+        }
+
+        .btn-add-item {
+            background-color: #8D6E63;
+            color: white;
+            border: none;
+            width: 100%;
+            padding: 8px;
+            border-radius: 6px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+
+        .btn-add-item:hover {
+            background-color: #6D4C41;
+        }
+
+        /* Lado Direito: Carrinho / Resumo da Venda */
+        .pos-cart-section {
+            background-color: #B5A992;
+            border-radius: 10px;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .cart-header {
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: #2C1D1A;
+            margin-bottom: 15px;
+            border-bottom: 2px solid #8D6E63;
+            padding-bottom: 8px;
+        }
+
+        .cart-items-list {
+            flex: 1;
+            overflow-y: auto;
+            margin-bottom: 15px;
+            padding-right: 5px;
+            max-height: calc(100vh - 360px);
+        }
+
+        .cart-item {
+            background-color: #FFF;
+            border-radius: 8px;
+            padding: 10px;
+            margin-bottom: 8px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .cart-item-info h5 {
+            font-size: 0.9rem;
+            color: #3E2723;
+            margin: 0;
+        }
+
+        .cart-item-info span {
+            font-size: 0.8rem;
+            color: #666;
+        }
+
+        .cart-item-controls {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .btn-qty {
+            background-color: #E0E0E0;
+            border: none;
+            width: 26px;
+            height: 26px;
+            border-radius: 4px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .btn-qty:hover {
+            background-color: #BDBDBD;
+        }
+
+        /* Input editável de quantidade no carrinho */
+        .input-cart-qty {
+            width: 48px;
+            height: 26px;
+            text-align: center;
+            font-size: 0.85rem;
+            font-weight: bold;
+            border: 1px solid #CCC;
+            border-radius: 4px;
+            padding: 0;
+            outline: none;
+        }
+
+        .input-cart-qty::-webkit-inner-spin-button, 
+        .input-cart-qty::-webkit-outer-spin-button { 
+            -webkit-appearance: none;
+            margin: 0;
+        }
+
+        .cart-summary {
+            border-top: 2px solid #8D6E63;
+            padding-top: 15px;
+        }
+
+        .summary-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 8px;
+            font-size: 1rem;
+            color: #2C1D1A;
+        }
+
+        .summary-row.total {
+            font-size: 1.4rem;
+            font-weight: bold;
+            color: #C02E28;
+            margin-top: 10px;
+        }
+
+        /* Modal de Finalização */
+        .modal-overlay {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0, 0, 0, 0.6);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .modal-card {
+            background: #FFF;
+            padding: 30px;
+            border-radius: 12px;
+            width: 400px;
+            max-width: 90%;
+        }
+    </style>
 </head>
 <body>
-  <div class="principal">
-    <nav class="sidebar">
-      <div class="logo">
-        <img class="logo-icone" src="imagens/logo.png" alt="Logo - Saboreal Biscoitos Caseiros">
-        <img class="logo-escrita" src="imagens/logoEscrita.png" alt="Escrita - Saboreal Biscoitos Caseiros">
-      </div>
- 
-      <a href="inicio.html"><svg class="icone" viewBox="0 0 24 24"><path d="M15 21v-8a1 1 0 0 0-1-1h-4a1 1 0 0 0-1 1v8"/><path d="M3 10a2 2 0 0 1 .709-1.528l7-5.999a2 2 0 0 1 2.582 0l7 5.999A2 2 0 0 1 21 10v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg> Início</a>
- 
-      <div class="grupo">
-        <a href="caixa.html"><svg class="icone" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M16 8h-6a2 2 0 1 0 0 4h4a2 2 0 1 1 0 4H8"/><path d="M12 18V6"/></svg> Caixa</a>
-        <div class="submenu">
-          <a href="#" data-secao="abrir-caixa">Abrir caixa</a>
-          <a href="#" data-secao="fechar-caixa">Fechar caixa</a>
-          <a href="#" data-secao="fluxo-caixa">Fluxo de caixa</a>
+    <div class="app-container">
+        <div id="sidebar-container"></div>
+        <div class="main-content">
+            <div class="top-bar">
+                <h2>Ponto de Venda (PDV)</h2>
+                <div class="user-info">👤 Gerência</div>
+            </div>
+            
+            <div class="page-body">
+                <div class="pos-container">
+                    
+                    <!-- Lado Esquerdo: Produtos em Cards -->
+                    <div class="pos-products-section">
+                        <div class="search-bar-container">
+                            <input type="text" id="inp-busca-prod" class="form-control" placeholder="🔍 Buscar produto por nome ou código..." oninput="filtrarProdutos()">
+                        </div>
+                        <div class="products-grid" id="grid-produtos">
+                            <!-- Produtos renderizados via JS -->
+                        </div>
+                    </div>
+
+                    <!-- Lado Direito: Carrinho de Compras -->
+                    <div class="pos-cart-section">
+                        <div>
+                            <div class="cart-header">🛒 Carrinho de Venda</div>
+                            <div class="cart-items-list" id="lista-carrinho">
+                                <p style="text-align: center; color: #5D4037; margin-top: 20px;">Carrinho vazio</p>
+                            </div>
+                        </div>
+
+                        <div class="cart-summary">
+                            <div class="summary-row">
+                                <span>Itens:</span>
+                                <span id="lbl-total-itens">0</span>
+                            </div>
+                            <div class="summary-row total">
+                                <span>Total:</span>
+                                <span id="lbl-total-valor">R$ 0,00</span>
+                            </div>
+                            <button class="btn-primary" style="width: 100%; margin-top: 15px; height: 48px; font-size: 1.1rem;" onclick="abrirModalPagamento()">Finalizar Venda</button>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
         </div>
-      </div>
- 
-      <div class="grupo">
-        <a href="vendas.html"><svg class="icone" viewBox="0 0 24 24"><circle cx="8" cy="21" r="1"/><circle cx="19" cy="21" r="1"/><path d="M2.05 2.05h2l2.66 12.42a2 2 0 0 0 2 1.58h9.78a2 2 0 0 0 1.95-1.57l1.65-7.43H5.12"/></svg> Vendas</a>
-        <div class="submenu">
-          <a href="#" data-secao="entradas">Entradas</a>
-          <a href="#" data-secao="saidas">Saídas</a>
+    </div>
+
+    <!-- Modal de Finalização / Pagamento -->
+    <div class="modal-overlay" id="modal-pagamento">
+        <div class="modal-card">
+            <h3 style="color: #3E2723; margin-bottom: 20px;">Finalizar Venda</h3>
+            <div style="margin-bottom: 15px;">
+                <label style="font-weight: bold;">Forma de Pagamento:</label>
+                <select id="select-forma-pagamento" class="form-control" style="margin-top: 5px;" onchange="atualizarCampoTroco()">
+                    <option value="Dinheiro">Dinheiro</option>
+                    <option value="PIX">PIX</option>
+                    <option value="Crédito">Cartão de Crédito</option>
+                    <option value="Débito">Cartão de Débito</option>
+                </select>
+            </div>
+
+            <div id="box-troco" style="margin-bottom: 15px;">
+                <label style="font-weight: bold;">Valor Recebido (R$):</label>
+                <input type="number" step="0.01" id="inp-valor-recebido" class="form-control" placeholder="0.00" oninput="calcularTroco()">
+                <div style="margin-top: 8px; font-weight: bold; color: #2E7D32;" id="lbl-troco">Troco: R$ 0,00</div>
+            </div>
+
+            <div style="display: flex; gap: 10px; margin-top: 25px;">
+                <button class="btn-primary" style="flex: 1; background-color: #757575;" onclick="fecharModalPagamento()">Cancelar</button>
+                <button class="btn-primary" style="flex: 1;" onclick="confirmarVenda()">Confirmar</button>
+            </div>
         </div>
-      </div>
- 
-      <a href="cadastro.html"><svg class="icone" viewBox="0 0 24 24"><path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"/><path d="M14 2v4a2 2 0 0 0 2 2h4"/><path d="M12 12v6"/><path d="M9 15h6"/></svg> Cadastro</a>
- 
-      <div class="grupo">
-        <a href="relatorios.html"><svg class="icone" viewBox="0 0 24 24"><path d="M3 3v18h18"/><path d="M18 17V9"/><path d="M13 17V5"/><path d="M8 17v-3"/></svg> Relatórios</a>
-        <div class="submenu">
-          <a href="#" data-secao="dashboard">Dashboard</a>
-          <a href="#" data-secao="historico-vendas">Histórico de vendas</a>
-        </div>
-      </div>
- 
-      <a href="login.html" class="sair"><svg class="icone" viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" x2="9" y1="12" y2="12"/></svg> Sair</a>
-    </nav>
- 
-    <main class="fundo">
-      <header class="topo">
-        <h1>Vendas</h1>
-        <span class="usuario">
-          <svg class="icone" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="10" r="3"/><path d="M7 20.662V19a2 2 0 0 1 2-2h6a2 2 0 0 1 2 2v1.662"/></svg>
-          Gerência
-        </span>
-      </header>
-      <section class="secao" id="entradas">
-        <p>Tela de Entradas - em construção.</p>
-      </section>
- 
-      <section class="secao" id="saidas">
-        <p>Tela de Saídas - em construção.</p>
-      </section>
- 
-    </main>
-  </div>
-  <script src="menu.js"></script>
+    </div>
+
+    <script src="api.js"></script>
+    <script src="sidebar.js"></script>
+    <script src="vendas.js"></script>
 </body>
 </html>

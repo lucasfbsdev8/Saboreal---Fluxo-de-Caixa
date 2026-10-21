@@ -1,74 +1,112 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Caixa - Saboreal</title>
-  <link rel="stylesheet" href="style.css">
-  <link rel="icon" href="imagens/icone.png">
+    <meta charset="UTF-8">
+    <title>Caixa - SABOREAL</title>
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <div class="principal">
-    <nav class="sidebar">
-      <div class="logo">
-        <img class="logo-icone" src="imagens/logo.png" alt="Logo - Saboreal Biscoitos Caseiros">
-        <img class="logo-escrita" src="imagens/logoEscrita.png" alt="Escrita - Saboreal Biscoitos Caseiros">
-      </div>
- 
-      <a href="inicio.html"><svg class="icone" viewBox="0 0 24 24"><path d="M15 21v-8a1 1 0 0 0-1-1h-4a1 1 0 0 0-1 1v8"/><path d="M3 10a2 2 0 0 1 .709-1.528l7-5.999a2 2 0 0 1 2.582 0l7 5.999A2 2 0 0 1 21 10v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg> Início</a>
- 
-      <div class="grupo">
-        <a href="caixa.html"><svg class="icone" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M16 8h-6a2 2 0 1 0 0 4h4a2 2 0 1 1 0 4H8"/><path d="M12 18V6"/></svg> Caixa</a>
-        <div class="submenu">
-          <a href="#" data-secao="abrir-caixa">Abrir caixa</a>
-          <a href="#" data-secao="fechar-caixa">Fechar caixa</a>
-          <a href="#" data-secao="fluxo-caixa">Fluxo de caixa</a>
+    <div class="app-container">
+        <div id="sidebar-container"></div>
+        <div class="main-content">
+            <div class="top-bar">
+                <h2 id="titulo-pagina">ABRIR CAIXA</h2>
+                <div class="user-info">👤 Gerência</div>
+            </div>
+            <div class="page-body">
+                
+                <!-- Secao: Abrir Caixa -->
+                <div id="secao-abrir" class="card-panel" style="max-width: 450px; margin: 0 auto; display:none;">
+                    <form id="form-abrir">
+                        <div class="form-group">
+                            <label>Operador</label>
+                            <input type="text" id="abrir-operador" class="form-control" value="Gerência" readonly>
+                        </div>
+                        <div class="form-group">
+                            <label>Valor em caixa (R$)</label>
+                            <input type="number" step="0.01" id="abrir-valor" class="form-control" value="0.00" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Observações (opcional)</label>
+                            <input type="text" id="abrir-obs" class="form-control" placeholder="Ex: troco reforçado hoje">
+                        </div>
+                        <button type="submit" class="btn-primary" style="width: 100%; margin-top: 10px;">Abrir caixa</button>
+                    </form>
+                </div>
+
+                <!-- Secao: Fechar Caixa -->
+                <div id="secao-fechar" class="card-panel" style="max-width: 500px; margin: 0 auto; display:none;">
+                    <h3>Fechamento de caixa</h3>
+                    <form id="form-fechar" style="margin-top: 15px;">
+                        <div class="form-group">
+                            <label>Valor total contado no caixa (R$)</label>
+                            <input type="number" step="0.01" id="fechar-valor" class="form-control" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Observação:</label>
+                            <input type="text" id="fechar-obs" class="form-control" placeholder="R$ 0,00">
+                        </div>
+                        <button type="submit" class="btn-primary" style="width: 100%;">Confirmar fechamento</button>
+                    </form>
+                </div>
+
+                <!-- Secao: Registrar Saida -->
+                <div id="secao-saida" class="card-panel" style="max-width: 500px; margin: 0 auto; display: none;">
+                    <h3>REGISTRAR SAÍDA</h3>
+                    <form id="form-saida" style="margin-top: 15px;">
+                        <div class="form-group">
+                            <label>Categoria</label>
+                            <select id="saida-categoria" class="form-control">
+                                <option>Despesa com produtos (insumos)</option>
+                                <option>Despesas administrativas</option>
+                                <option>Despesas operacionais</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Descrição</label>
+                            <input type="text" id="saida-descricao" class="form-control" placeholder="Ex: Compra de farinha">
+                        </div>
+                        <div class="form-group">
+                            <label>Valor (R$)</label>
+                            <input type="number" step="0.01" id="saida-valor" class="form-control" placeholder="R$ 0,00" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Forma de pagamento</label>
+                            <select id="saida-forma" class="form-control">
+                                <option>Dinheiro</option>
+                                <option>PIX</option>
+                                <option>Cartão</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Retirado de:</label>
+                            <input type="text" id="saida-origem" class="form-control" value="Caixa" readonly>
+                        </div>
+                        <button type="submit" class="btn-primary" style="width: 100%;">Registrar saída</button>
+                    </form>
+                </div>
+
+                <!-- Secao: Fluxo de Caixa -->
+                <div id="secao-fluxo" class="card-panel" style="display: none;">
+                    <h3>Fluxo de caixa (Abril a setembro de 2026)</h3>
+                    <div style="overflow-x: auto; margin-top: 15px;">
+                        <table class="table-custom">
+                            <thead>
+                                <tr id="tr-header-fluxo">
+                                    <th>Fluxo de caixa</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tb-body-fluxo">
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+            </div>
         </div>
-      </div>
- 
-      <div class="grupo">
-        <a href="vendas.html"><svg class="icone" viewBox="0 0 24 24"><circle cx="8" cy="21" r="1"/><circle cx="19" cy="21" r="1"/><path d="M2.05 2.05h2l2.66 12.42a2 2 0 0 0 2 1.58h9.78a2 2 0 0 0 1.95-1.57l1.65-7.43H5.12"/></svg> Vendas</a>
-        <div class="submenu">
-          <a href="#" data-secao="entradas">Entradas</a>
-          <a href="#" data-secao="saidas">Saídas</a>
-        </div>
-      </div>
- 
-      <a href="cadastro.html"><svg class="icone" viewBox="0 0 24 24"><path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"/><path d="M14 2v4a2 2 0 0 0 2 2h4"/><path d="M12 12v6"/><path d="M9 15h6"/></svg> Cadastro</a>
- 
-      <div class="grupo">
-        <a href="relatorios.html"><svg class="icone" viewBox="0 0 24 24"><path d="M3 3v18h18"/><path d="M18 17V9"/><path d="M13 17V5"/><path d="M8 17v-3"/></svg> Relatórios</a>
-        <div class="submenu">
-          <a href="#" data-secao="dashboard">Dashboard</a>
-          <a href="#" data-secao="historico-vendas">Histórico de vendas</a>
-        </div>
-      </div>
- 
-      <a href="login.html" class="sair"><svg class="icone" viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" x2="9" y1="12" y2="12"/></svg> Sair</a>
-    </nav>
- 
-    <main class="fundo">
-      <header class="topo">
-        <h1>Caixa</h1>
-        <span class="usuario">
-          <svg class="icone" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="10" r="3"/><path d="M7 20.662V19a2 2 0 0 1 2-2h6a2 2 0 0 1 2 2v1.662"/></svg>
-          Gerência
-        </span>
-      </header>
-      <section class="secao" id="abrir-caixa">
-        <p>Tela de Abrir caixa - em construção.</p>
-      </section>
- 
-      <section class="secao" id="fechar-caixa">
-        <p>Tela de Fechar caixa - em construção.</p>
-      </section>
- 
-      <section class="secao" id="fluxo-caixa">
-        <p>Tela de Fluxo de caixa - em construção.</p>
-      </section>
- 
-    </main>
-  </div>
-  <script src="menu.js"></script>
+    </div>
+    <script src="api.js"></script>
+    <script src="sidebar.js"></script>
+    <script src="caixa.js"></script>
 </body>
 </html>

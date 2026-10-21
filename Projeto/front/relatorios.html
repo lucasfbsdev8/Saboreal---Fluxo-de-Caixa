@@ -1,70 +1,146 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Relatórios - Saboreal</title>
-  <link rel="stylesheet" href="style.css">
-  <link rel="icon" href="imagens/icone.png">
+    <meta charset="UTF-8">
+    <title>Relatórios - SABOREAL</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.2.0"></script>
+    <style>
+        .relatorio-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        .btn-filtro {
+            background-color: #8D6E63;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-weight: bold;
+            margin-left: 5px;
+        }
+        .btn-filtro.active {
+            background-color: #D9534F;
+        }
+        .chart-container {
+            position: relative;
+            height: 220px;
+            width: 100%;
+            margin-top: 10px;
+        }
+        .pagamento-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            align-items: center;
+        }
+        .pagamento-lista {
+            list-style: none;
+            line-height: 2.2;
+            font-size: 0.95rem;
+        }
+        .pagamento-lista li {
+            display: flex;
+            justify-content: space-between;
+            border-bottom: 1px dashed #A1887F;
+            padding-bottom: 2px;
+        }
+    </style>
 </head>
 <body>
-  <div class="principal">
-    <nav class="sidebar">
-      <div class="logo">
-        <img class="logo-icone" src="imagens/logo.png" alt="Logo - Saboreal Biscoitos Caseiros">
-        <img class="logo-escrita" src="imagens/logoEscrita.png" alt="Escrita - Saboreal Biscoitos Caseiros">
-      </div>
- 
-      <a href="inicio.html"><svg class="icone" viewBox="0 0 24 24"><path d="M15 21v-8a1 1 0 0 0-1-1h-4a1 1 0 0 0-1 1v8"/><path d="M3 10a2 2 0 0 1 .709-1.528l7-5.999a2 2 0 0 1 2.582 0l7 5.999A2 2 0 0 1 21 10v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg> Início</a>
- 
-      <div class="grupo">
-        <a href="caixa.html"><svg class="icone" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M16 8h-6a2 2 0 1 0 0 4h4a2 2 0 1 1 0 4H8"/><path d="M12 18V6"/></svg> Caixa</a>
-        <div class="submenu">
-          <a href="#" data-secao="abrir-caixa">Abrir caixa</a>
-          <a href="#" data-secao="fechar-caixa">Fechar caixa</a>
-          <a href="#" data-secao="fluxo-caixa">Fluxo de caixa</a>
+    <div class="app-container">
+        <div id="sidebar-container"></div>
+        <div class="main-content">
+            <div class="top-bar">
+                <h2 id="titulo-relatorios">Relatório financeiro</h2>
+                <div class="user-info">👤 Gerência</div>
+            </div>
+            <div class="page-body">
+                
+                <!-- VISÃO 1: DASHBOARD -->
+                <div id="visao-dashboard">
+                    <div class="relatorio-header">
+                        <h3 id="lbl-mes-atual" style="color: #3E2723; text-transform: uppercase;">SETEMBRO</h3>
+                        <div>
+                            <button id="btn-filtro-hoje" class="btn-filtro" onclick="filtrarPeriodo('hoje', this)">Hoje</button>
+                            <button id="btn-filtro-semana" class="btn-filtro" onclick="filtrarPeriodo('semana', this)">Semana</button>
+                            <button id="btn-filtro-mes" class="btn-filtro active" onclick="filtrarPeriodo('mes', this)">Mês</button>
+                        </div>
+                    </div>
+
+                    <div class="cards-grid">
+                        <div class="metric-card">
+                            <h4>Entradas</h4>
+                            <div class="value" id="card-entradas" style="color: #2E7D32;">R$ 0,00</div>
+                        </div>
+                        <div class="metric-card">
+                            <h4>Saídas</h4>
+                            <div class="value" id="card-saidas" style="color: #C62828;">R$ 0,00</div>
+                        </div>
+                        <div class="metric-card">
+                            <h4>Saldo</h4>
+                            <div class="value" id="card-saldo" style="color: #1565C0;">R$ 0,00</div>
+                        </div>
+                    </div>
+
+                    <div class="card-panel">
+                        <h3>Entradas x saídas por mês</h3>
+                        <div class="chart-container">
+                            <canvas id="chartEntradasSaidas"></canvas>
+                        </div>
+                    </div>
+
+                    <div class="card-panel">
+                        <h3>Evolução do saldo</h3>
+                        <div class="chart-container">
+                            <canvas id="chartEvolucaoSaldo"></canvas>
+                        </div>
+                    </div>
+
+                    <div class="card-panel">
+                        <h3>Vendas por forma de pagamento</h3>
+                        <div class="pagamento-grid">
+                            <div style="height: 220px;">
+                                <canvas id="chartFormasPagamento"></canvas>
+                            </div>
+                            <ul class="pagamento-lista" id="lista-pagamentos">
+                                <li><span>🟢 Dinheiro</span> <strong id="val-dinheiro">R$ 0,00</strong></li>
+                                <li><span>🔵 PIX</span> <strong id="val-pix">R$ 0,00</strong></li>
+                                <li><span>🟣 Crédito</span> <strong id="val-credito">R$ 0,00</strong></li>
+                                <li><span>🟠 Débito</span> <strong id="val-debito">R$ 0,00</strong></li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- VISÃO 2: HISTÓRICO DE VENDAS -->
+                <div id="visao-historico" style="display: none;">
+                    <div class="card-panel">
+                        <h3>Histórico de Vendas (Turno Atual)</h3>
+                        <table class="table-custom" style="margin-top: 15px;">
+                            <thead>
+                                <tr>
+                                    <th>Hora</th>
+                                    <th>Itens</th>
+                                    <th>Pagamento</th>
+                                    <th>Valor</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tb-historico-vendas">
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+            </div>
         </div>
-      </div>
- 
-      <div class="grupo">
-        <a href="vendas.html"><svg class="icone" viewBox="0 0 24 24"><circle cx="8" cy="21" r="1"/><circle cx="19" cy="21" r="1"/><path d="M2.05 2.05h2l2.66 12.42a2 2 0 0 0 2 1.58h9.78a2 2 0 0 0 1.95-1.57l1.65-7.43H5.12"/></svg> Vendas</a>
-        <div class="submenu">
-          <a href="#" data-secao="entradas">Entradas</a>
-          <a href="#" data-secao="saidas">Saídas</a>
-        </div>
-      </div>
- 
-      <a href="cadastro.html"><svg class="icone" viewBox="0 0 24 24"><path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"/><path d="M14 2v4a2 2 0 0 0 2 2h4"/><path d="M12 12v6"/><path d="M9 15h6"/></svg> Cadastro</a>
- 
-      <div class="grupo">
-        <a href="relatorios.html"><svg class="icone" viewBox="0 0 24 24"><path d="M3 3v18h18"/><path d="M18 17V9"/><path d="M13 17V5"/><path d="M8 17v-3"/></svg> Relatórios</a>
-        <div class="submenu">
-          <a href="#" data-secao="dashboard">Dashboard</a>
-          <a href="#" data-secao="historico-vendas">Histórico de vendas</a>
-        </div>
-      </div>
- 
-      <a href="login.html" class="sair"><svg class="icone" viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" x2="9" y1="12" y2="12"/></svg> Sair</a>
-    </nav>
- 
-    <main class="fundo">
-      <header class="topo">
-        <h1>Relatórios</h1>
-        <span class="usuario">
-          <svg class="icone" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="10" r="3"/><path d="M7 20.662V19a2 2 0 0 1 2-2h6a2 2 0 0 1 2 2v1.662"/></svg>
-          Gerência
-        </span>
-      </header>
-      <section class="secao" id="dashboard">
-        <p>Tela de Dashboard - em construção.</p>
-      </section>
- 
-      <section class="secao" id="historico-vendas">
-        <p>Tela de Histórico de vendas - em construção.</p>
-      </section>
- 
-    </main>
-  </div>
-  <script src="menu.js"></script>
+    </div>
+    <script src="api.js"></script>
+    <script src="sidebar.js"></script>
+    <script src="relatorios.js"></script>
 </body>
 </html>

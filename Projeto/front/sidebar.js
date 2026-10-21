@@ -1,41 +1,61 @@
-var paginaAtual = location.pathname.split("/").pop() || "inicio.html";
- 
-document.querySelectorAll(".sidebar a[href$='.html']").forEach(function (link) {
-  if (link.getAttribute("href") !== paginaAtual) return;
-  link.classList.add("ativo");
-  var grupo = link.closest(".grupo");
-  if (grupo) grupo.classList.add("aberto");
-});
-var linksSub = document.querySelectorAll(".grupo.aberto .submenu a");
- 
-function mostrar(nome) {
-  document.querySelectorAll(".secao").forEach(function (secao) {
-    secao.classList.toggle("visivel", secao.id === nome);
-  });
-  linksSub.forEach(function (link) {
-    var ativo = link.dataset.secao === nome;
-    link.classList.toggle("ativo", ativo);
-    if (ativo) document.querySelector(".topo h1").textContent = link.textContent.trim();
-  });
-}
- 
-if (linksSub.length > 0) {
-  linksSub.forEach(function (link) {
-    link.addEventListener("click", function (event) {
-      event.preventDefault();
-      mostrar(link.dataset.secao);
-      history.replaceState(null, "", "#" + link.dataset.secao);
+document.addEventListener('DOMContentLoaded', () => {
+    const container = document.getElementById('sidebar-container');
+    if (!container) return;
+
+    const path = window.location.pathname.split('/').pop();
+    const params = new URLSearchParams(window.location.search);
+    const aba = params.get('aba');
+    const usuario = localStorage.getItem('usuario') || 'Gerência';
+
+    container.innerHTML = `
+        <div class="sidebar">
+            <div>
+                <div class="brand">
+                    <img src="imagens/logo.png" alt="Logo Saboreal" style="width: 50px; height: auto; margin-bottom: 5px;">
+                    <h1>SABOREAL</h1>
+                    <p>BISCOITOS CASEIROS</p>
+                </div>
+                <ul class="menu">
+                    <li class="${path === 'inicio.html' ? 'active' : ''}">
+                        <a href="inicio.html">🏠 Início</a>
+                    </li>
+                    <li class="${path.includes('caixa') ? 'active' : ''}">
+                        <a href="caixa.html">💲 Caixa</a>
+                        ${path.includes('caixa') ? `
+                        <ul class="sub-menu">
+                            <li><a href="caixa.html?aba=abrir">Abrir caixa</a></li>
+                            <li><a href="caixa.html?aba=fechar">Fechar caixa</a></li>
+                            <li><a href="caixa.html?aba=fluxo">Fluxo de caixa</a></li>
+                        </ul>` : ''}
+                    </li>
+                    <li class="${path === 'vendas.html' ? 'active' : ''}">
+                        <a href="vendas.html">🛒 Vendas</a>
+                        ${path === 'vendas.html' ? `
+                        <ul class="sub-menu">
+                            <li><a href="vendas.html">Entradas</a></li>
+                            <li><a href="caixa.html?aba=saida">Saídas</a></li>
+                        </ul>` : ''}
+                    </li>
+                    <li class="${path === 'cadastro.html' ? 'active' : ''}">
+                        <a href="cadastro.html">➕ Cadastro</a>
+                    </li>
+                    <li class="${path === 'relatorios.html' ? 'active' : ''}">
+                        <a href="relatorios.html">📊 Relatórios</a>
+                        ${path === 'relatorios.html' ? `
+                        <ul class="sub-menu">
+                            <li><a href="relatorios.html?aba=dashboard">Dashboard</a></li>
+                            <li><a href="relatorios.html?aba=historico">Histórico de vendas</a></li>
+                        </ul>` : ''}
+                    </li>
+                </ul>
+            </div>
+            <ul class="menu">
+                <li><a href="login.html" id="btn-sair">➔ Sair (${usuario})</a></li>
+            </ul>
+        </div>
+    `;
+
+    document.getElementById('btn-sair')?.addEventListener('click', () => {
+        localStorage.clear();
     });
-  });
- 
-  var inicial = location.hash.slice(1);
-  var existe = Array.from(linksSub).some(function (l) { return l.dataset.secao === inicial; });
-  mostrar(existe ? inicial : linksSub[0].dataset.secao);
- 
-  var principal = document.querySelector(".grupo.aberto > a");
-  principal.addEventListener("click", function (event) {
-    event.preventDefault();
-    mostrar(linksSub[0].dataset.secao);
-    history.replaceState(null, "", location.pathname);
-  });
-}
+});

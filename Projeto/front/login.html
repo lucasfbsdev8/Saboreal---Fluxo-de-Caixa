@@ -1,40 +1,205 @@
 <!DOCTYPE html>
-<html lang="pt-br">
+<html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login - Saboreal</title>
+    <title>Login - SABOREAL</title>
     <link rel="stylesheet" href="style.css">
-    <link rel="icon" href="imagens/icone.png">
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Arial, sans-serif;
+        }
+
+        body, html {
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+        }
+
+        .login-container {
+            display: flex;
+            width: 100vw;
+            height: 100vh;
+        }
+
+        /* Lado Esquerdo: Banner com a Imagem de Fundo e Layout */
+        .banner-container {
+            flex: 1.6;
+            background: url('imagens/fundo.png') no-repeat center center;
+            background-size: cover;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            padding: 50px 60px;
+        }
+
+        .brand-header-left {
+            display: flex;
+            justify-content: flex-end; /* Alinha a logo escrita à direita para não cobrir a cesta de pães */
+            padding-right: 40px;
+            padding-top: 10px;
+        }
+
+        .logo-escrita-img {
+            max-width: 320px;
+            height: auto;
+            object-fit: contain;
+        }
+
+        .system-title-bottom {
+            font-size: 2.8rem;
+            font-weight: 800;
+            color: #4A3525;
+            margin-bottom: 20px;
+            margin-left: 20px;
+            letter-spacing: 0.5px;
+        }
+
+        /* Lado Direito: Formulário com Fundo Castanho Escuro */
+        .form-side {
+            flex: 1;
+            background-color: #534338; /* Castanho exato do protótipo */
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 40px;
+        }
+
+        .form-content {
+            width: 100%;
+            max-width: 320px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .chef-hat-icon {
+            width: 110px;
+            height: auto;
+            margin-bottom: 30px;
+        }
+
+        .welcome-title {
+            color: #FFFFFF;
+            font-size: 2.2rem;
+            font-weight: bold;
+            margin-bottom: 35px;
+        }
+
+        .input-group-proto {
+            width: 100%;
+            position: relative;
+            margin-bottom: 18px;
+        }
+
+        .input-group-proto input {
+            width: 100%;
+            height: 48px;
+            background-color: #E0E0E0;
+            border: none;
+            border-radius: 24px;
+            padding: 0 20px 0 45px;
+            font-size: 1.05rem;
+            color: #333;
+            outline: none;
+        }
+
+        .input-group-proto .input-icon {
+            position: absolute;
+            left: 18px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 1.1rem;
+            color: #333;
+        }
+
+        .btn-login-proto {
+            width: 100%;
+            height: 50px;
+            background-color: #C02E28; /* Vermelho do protótipo */
+            color: #FFFFFF;
+            border: none;
+            border-radius: 25px;
+            font-size: 1.3rem;
+            font-weight: bold;
+            cursor: pointer;
+            margin-top: 15px;
+            transition: background-color 0.2s;
+        }
+
+        .btn-login-proto:hover {
+            background-color: #A0231D;
+        }
+
+        /* Ajuste de responsividade */
+        @media (max-width: 850px) {
+            .banner-container {
+                display: none;
+            }
+            .form-side {
+                flex: 1;
+            }
+        }
+    </style>
 </head>
 <body>
-    <div class="login">
+    <div class="login-container">
+        
+        <!-- Esquerda: Banner com Fundo, Logo Escrita e Texto do Protótipo -->
+        <div class="banner-container">
+            <div class="brand-header-left">
+                <img src="imagens/logoEscrita.png" alt="SABOREAL BISCOITOS CASEIROS" class="logo-escrita-img">
+            </div>
+            
+            <div class="system-title-bottom">
+                Sistema de gestão
+            </div>
+        </div>
 
-    <section class="login-foto">
-      <img class="login-escrita" src="imagens/logoEscrita.png" alt="Saboreal Biscoitos Caseiros">
-      <h2 class="login-subtitulo">Sistema de gestão</h2>
-    </section>
- 
-    <main class="login-painel">
-      <h1 class="login-titulo">Bem-vindo!</h1>
-      <img class="login-logo" src="imagens/logo.png" alt="Logo - Saboreal Biscoitos Caseiros">
- 
-      <!-- provisório: ao enviar, vai para o início. Depois será trocado pelo envio ao Flask -->
-      <form class="login-form" onsubmit="location.href='inicio.html'; return false;">
-        <div class="login-campo">
-          <svg class="icone" viewBox="0 0 24 24"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
-          <input type="text" id="usuario" name="usuario" placeholder="Usuário" aria-label="Usuário" autocomplete="username" required>
+        <!-- Direita: Formulário de Login Castanho -->
+        <div class="form-side">
+            <div class="form-content">
+                <!-- Ícone do Chapéu de Cozinheiro -->
+                <img src="imagens/logo.png" alt="Chapéu de Cozinheiro" class="chef-hat-icon">
+
+                <div class="welcome-title">Bem vindo!</div>
+
+                <form id="form-login" style="width: 100%;">
+                    <div class="input-group-proto">
+                        <span class="input-icon">👤</span>
+                        <input type="text" id="usuario" placeholder="Usuário:" required>
+                    </div>
+
+                    <div class="input-group-proto">
+                        <span class="input-icon">🔒</span>
+                        <input type="password" id="senha" placeholder="Senha:" required>
+                    </div>
+
+                    <button type="submit" class="btn-login-proto">Login</button>
+                </form>
+            </div>
         </div>
- 
-        <div class="login-campo">
-          <svg class="icone" viewBox="0 0 24 24"><rect width="18" height="11" x="3" y="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
-          <input type="password" id="senha" name="senha" placeholder="Senha" aria-label="Senha" autocomplete="current-password" required>
-        </div>
- 
-        <button type="submit" class="login-botao">Login</button>
-      </form>
-    </main>
- 
-  </div>
+
+    </div>
+
+    <script src="api.js"></script>
+    <script>
+        document.getElementById('form-login').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const res = await apiRequest('/login', 'POST', {
+                usuario: document.getElementById('usuario').value,
+                senha: document.getElementById('senha').value
+            });
+            if (res && res.sucesso) {
+                localStorage.setItem('usuario', res.usuario);
+                window.location.href = 'inicio.html';
+            }
+        });
+    </script>
 </body>
 </html>
