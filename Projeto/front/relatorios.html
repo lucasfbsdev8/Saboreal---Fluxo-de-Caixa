@@ -1,32 +1,145 @@
-<!-- relatorios.html -->
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
     <title>Relatórios - SABOREAL</title>
     <link rel="stylesheet" href="style.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.2.0"></script>
+    <style>
+        .relatorio-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        .btn-filtro {
+            background-color: #8D6E63;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-weight: bold;
+            margin-left: 5px;
+        }
+        .btn-filtro.active {
+            background-color: #D9534F;
+        }
+        .chart-container {
+            position: relative;
+            height: 220px;
+            width: 100%;
+            margin-top: 10px;
+        }
+        .pagamento-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            align-items: center;
+        }
+        .pagamento-lista {
+            list-style: none;
+            line-height: 2.2;
+            font-size: 0.95rem;
+        }
+        .pagamento-lista li {
+            display: flex;
+            justify-content: space-between;
+            border-bottom: 1px dashed #A1887F;
+            padding-bottom: 2px;
+        }
+    </style>
 </head>
 <body>
     <div class="app-container">
         <div id="sidebar-container"></div>
         <div class="main-content">
             <div class="top-bar">
-                <h2>Relatório financeiro</h2>
+                <h2 id="titulo-relatorios">Relatório financeiro</h2>
                 <div class="user-info">👤 Gerência</div>
             </div>
             <div class="page-body">
-                <div class="card-panel">
-                    <h3>Vendas por forma de pagamento</h3>
-                    <ul style="list-style: none; margin-top: 15px; line-height: 2;">
-                        <li>💵 <strong>Dinheiro:</strong> R$ 5.294,80 (35%)</li>
-                        <li>📱 <strong>PIX:</strong> R$ 3.630,72 (24%)</li>
-                        <li>💳 <strong>Crédito:</strong> R$ 3.025,60 (20%)</li>
-                        <li>💳 <strong>Débito:</strong> R$ 1.815,36 (12%)</li>
-                    </ul>
+                
+                <!-- VISÃO 1: DASHBOARD -->
+                <div id="visao-dashboard">
+                    <div class="relatorio-header">
+                        <h3 id="lbl-mes-atual" style="color: #3E2723; text-transform: uppercase;">SETEMBRO</h3>
+                        <div>
+                            <button id="btn-filtro-hoje" class="btn-filtro" onclick="filtrarPeriodo('hoje', this)">Hoje</button>
+                            <button id="btn-filtro-semana" class="btn-filtro" onclick="filtrarPeriodo('semana', this)">Semana</button>
+                            <button id="btn-filtro-mes" class="btn-filtro active" onclick="filtrarPeriodo('mes', this)">Mês</button>
+                        </div>
+                    </div>
+
+                    <div class="cards-grid">
+                        <div class="metric-card">
+                            <h4>Entradas</h4>
+                            <div class="value" id="card-entradas" style="color: #2E7D32;">R$ 0,00</div>
+                        </div>
+                        <div class="metric-card">
+                            <h4>Saídas</h4>
+                            <div class="value" id="card-saidas" style="color: #C62828;">R$ 0,00</div>
+                        </div>
+                        <div class="metric-card">
+                            <h4>Saldo</h4>
+                            <div class="value" id="card-saldo" style="color: #1565C0;">R$ 0,00</div>
+                        </div>
+                    </div>
+
+                    <div class="card-panel">
+                        <h3>Entradas x saídas por mês</h3>
+                        <div class="chart-container">
+                            <canvas id="chartEntradasSaidas"></canvas>
+                        </div>
+                    </div>
+
+                    <div class="card-panel">
+                        <h3>Evolução do saldo</h3>
+                        <div class="chart-container">
+                            <canvas id="chartEvolucaoSaldo"></canvas>
+                        </div>
+                    </div>
+
+                    <div class="card-panel">
+                        <h3>Vendas por forma de pagamento</h3>
+                        <div class="pagamento-grid">
+                            <div style="height: 220px;">
+                                <canvas id="chartFormasPagamento"></canvas>
+                            </div>
+                            <ul class="pagamento-lista" id="lista-pagamentos">
+                                <li><span>🟢 Dinheiro</span> <strong id="val-dinheiro">R$ 0,00</strong></li>
+                                <li><span>🔵 PIX</span> <strong id="val-pix">R$ 0,00</strong></li>
+                                <li><span>🟣 Crédito</span> <strong id="val-credito">R$ 0,00</strong></li>
+                                <li><span>🟠 Débito</span> <strong id="val-debito">R$ 0,00</strong></li>
+                            </ul>
+                        </div>
+                    </div>
                 </div>
+
+                <!-- VISÃO 2: HISTÓRICO DE VENDAS -->
+                <div id="visao-historico" style="display: none;">
+                    <div class="card-panel">
+                        <h3>Histórico de Vendas (Turno Atual)</h3>
+                        <table class="table-custom" style="margin-top: 15px;">
+                            <thead>
+                                <tr>
+                                    <th>Hora</th>
+                                    <th>Itens</th>
+                                    <th>Pagamento</th>
+                                    <th>Valor</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tb-historico-vendas">
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
             </div>
         </div>
     </div>
+    <script src="api.js"></script>
     <script src="sidebar.js"></script>
     <script src="relatorios.js"></script>
 </body>

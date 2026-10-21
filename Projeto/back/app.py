@@ -4,13 +4,12 @@ from flask import Flask, request, jsonify
 from flask_cors import CORS
 
 app = Flask(__name__)
-CORS(app) # Permite requisicoes do Frontend JS
+CORS(app)
 
 DB_PATH = os.path.join(os.path.dirname(__file__), '../banco/saboreal.db')
 SCHEMA_PATH = os.path.join(os.path.dirname(__file__), '../banco/schema.sql')
 
 def init_db():
-    """ Inicializa o banco de dados caso nao exista """
     os.makedirs(os.path.dirname(DB_PATH), exist_ok=True)
     conn = sqlite3.connect(DB_PATH)
     cursor = conn.cursor()
@@ -23,8 +22,6 @@ def get_db():
     conn = sqlite3.connect(DB_PATH)
     conn.row_factory = sqlite3.Row
     return conn
-
-# --- ROTAS DA API ---
 
 @app.route('/api/login', methods=['POST'])
 def login():
@@ -59,6 +56,29 @@ def produtos():
             db.close()
             return jsonify({'sucesso': False, 'erro': str(e)}), 400
 
+@app.route('/api/produtos/estoque', methods=['POST'])
+def ajustar_estoque():
+    data = request.json
+    codigo = data.get('codigo')
+    quantidade = int(data.get('quantidade', 0))
+
+    db = get_db()
+    prod = db.execute('SELECT estoque FROM produtos WHERE codigo = ?', (codigo,)).fetchone()
+    
+    if not prod:
+        db.close()
+        return jsonify({'sucesso': False, 'erro': 'Produto não encontrado.'}), 404
+
+    novo_estoque = prod['estoque'] + quantidade
+    if novo_estoque < 0:
+        db.close()
+        return jsonify({'sucesso': False, 'erro': 'O estoque não pode ser negativo.'}), 400
+
+    db.execute('UPDATE produtos SET estoque = ? WHERE codigo = ?', (novo_estoque, codigo))
+    db.commit()
+    db.close()
+    return jsonify({'sucesso': True, 'novo_estoque': novo_estoque})
+
 @app.route('/api/caixa/status', methods=['GET'])
 def caixa_status():
     db = get_db()
@@ -92,11 +112,48 @@ def fechar_caixa():
     db.close()
     return jsonify({'sucesso': False, 'mensagem': 'Nenhum caixa aberto encontrado.'}), 400
 
+@app.route('/api/movimentacoes', methods=['POST', 'GET'])
+def movimentacoes():
+    db = get_db()
+    if request.method == 'POST':
+        data = request.json
+        db.execute('''INSERT INTO movimentacoes_caixa 
+                      (tipo, categoria, descricao, valor, forma_pagamento, retirado_de) 
+                      VALUES (?, ?, ?, ?, ?, ?)''',
+                   (data['tipo'], data['categoria'], data['descricao'], 
+                    data['valor'], data['forma_pagamento'], data.get('retirado_de', 'Caixa')))
+        db.commit()
+        db.close()
+        return jsonify({'sucesso': True, 'mensagem': 'Movimentação registrada!'})
+    else:
+        movs = db.execute('SELECT * FROM movimentacoes_caixa ORDER BY data_movimentacao DESC').fetchall()
+        db.close()
+        return jsonify([dict(m) for m in movs])
+
+@app.route('/api/caixa/fluxo', methods=['GET'])
+def obter_fluxo_caixa():
+    db = get_db()
+    fluxos = db.execute('SELECT * FROM fluxo_caixa_mensal ORDER BY id ASC').fetchall()
+    db.close()
+    return jsonify([dict(f) for f in fluxos])
+
 @app.route('/api/vendas', methods=['POST'])
 def realizar_venda():
     data = request.json
     db = get_db()
     try:
+        for item in data['itens']:
+            prod = db.execute('SELECT estoque, nome FROM produtos WHERE codigo = ?', (item['codigo'],)).fetchone()
+            if not prod:
+                db.close()
+                return jsonify({'sucesso': False, 'erro': f"Produto {item['codigo']} não encontrado."}), 400
+            if prod['estoque'] < item['quantidade']:
+                db.close()
+                return jsonify({
+                    'sucesso': False, 
+                    'erro': f"Estoque insuficiente para '{prod['nome']}'! Disponível: {prod['estoque']}, Solicitado: {item['quantidade']}"
+                }), 400
+
         caixa = db.execute('SELECT id FROM caixa WHERE status = "ABERTO" ORDER BY id DESC LIMIT 1').fetchone()
         caixa_id = caixa['id'] if caixa else None
 
@@ -108,7 +165,6 @@ def realizar_venda():
         for item in data['itens']:
             cursor.execute('INSERT INTO itens_venda (venda_id, produto_codigo, quantidade, preco_unitario) VALUES (?, ?, ?, ?)',
                            (venda_id, item['codigo'], item['quantidade'], item['preco']))
-            # Baixa no estoque
             cursor.execute('UPDATE produtos SET estoque = estoque - ? WHERE codigo = ?', 
                            (item['quantidade'], item['codigo']))
         
@@ -120,16 +176,69 @@ def realizar_venda():
         db.close()
         return jsonify({'sucesso': False, 'erro': str(e)}), 500
 
+@app.route('/api/vendas/historico', methods=['GET'])
+def historico_vendas():
+    db = get_db()
+    vendas = db.execute('''
+        SELECT v.id, strftime('%H:%M', v.data_venda) as hora, v.total, v.forma_pagamento,
+               GROUP_CONCAT(i.quantidade || 'x ' || p.nome, ', ') as itens
+        FROM vendas v
+        JOIN itens_venda i ON v.id = i.venda_id
+        JOIN produtos p ON i.produto_codigo = p.codigo
+        GROUP BY v.id
+        ORDER BY v.data_venda DESC
+    ''').fetchall()
+    db.close()
+    return jsonify([dict(v) for v in vendas])
+
+# FILTRO DE DATAS FUNCIONAL NO DASHBOARD (Hoje, Semana, Mes)
 @app.route('/api/dashboard/resumo', methods=['GET'])
 def dashboard_resumo():
+    periodo = request.args.get('periodo', 'mes')
     db = get_db()
-    faturamento_hoje = db.execute("SELECT SUM(total) as total FROM vendas WHERE date(data_venda) = date('now')").fetchone()['total'] or 0.0
-    vendas_hoje = db.execute("SELECT COUNT(*) as qtd FROM vendas WHERE date(data_venda) = date('now')").fetchone()['qtd'] or 0
+
+    condicao_vendas = "1=1"
+    condicao_saidas = "tipo = 'SAIDA'"
+
+    if periodo == 'hoje':
+        condicao_vendas = "date(data_venda) = date('now', 'localtime')"
+        condicao_saidas += " AND date(data_movimentacao) = date('now', 'localtime')"
+    elif periodo == 'semana':
+        condicao_vendas = "data_venda >= date('now', '-7 days', 'localtime')"
+        condicao_saidas += " AND data_movimentacao >= date('now', '-7 days', 'localtime')"
+    elif periodo == 'mes':
+        condicao_vendas = "strftime('%Y-%m', data_venda) = strftime('%Y-%m', 'now', 'localtime')"
+        condicao_saidas += " AND strftime('%Y-%m', data_movimentacao) = strftime('%Y-%m', 'now', 'localtime')"
+
+    query_vendas = f"SELECT SUM(total) as total, COUNT(*) as qtd FROM vendas WHERE {condicao_vendas}"
+    res_vendas = db.execute(query_vendas).fetchone()
+    
+    query_saidas = f"SELECT SUM(valor) as total FROM movimentacoes_caixa WHERE {condicao_saidas}"
+    res_saidas = db.execute(query_saidas).fetchone()
+
+    faturamento = res_vendas['total'] or 0.0
+    vendas_qtd = res_vendas['qtd'] or 0
+    saidas = res_saidas['total'] or 0.0
+
+    # Busca detalhamento das formas de pagamento no periodo selecionado
+    query_formas = f"SELECT forma_pagamento, SUM(total) as total FROM vendas WHERE {condicao_vendas} GROUP BY forma_pagamento"
+    formas = db.execute(query_formas).fetchall()
+    
+    dict_formas = {f['forma_pagamento']: f['total'] for f in formas}
+
     db.close()
+
     return jsonify({
-        'faturamento_hoje': faturamento_hoje,
-        'vendas_hoje': vendas_hoje,
-        'dinheiro_caixa': faturamento_hoje + 500.00
+        'faturamento_hoje': faturamento,
+        'vendas_hoje': vendas_qtd,
+        'saidas': saidas,
+        'saldo': faturamento - saidas,
+        'formas_pagamento': {
+            'Dinheiro': dict_formas.get('Dinheiro', 0.0),
+            'PIX': dict_formas.get('PIX', 0.0),
+            'Crédito': dict_formas.get('Crédito', 0.0),
+            'Débito': dict_formas.get('Débito', 0.0)
+        }
     })
 
 if __name__ == '__main__':

@@ -1,4 +1,3 @@
-<!-- caixa.html -->
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
@@ -16,6 +15,7 @@
             </div>
             <div class="page-body">
                 
+                <!-- Secao: Abrir Caixa -->
                 <div id="secao-abrir" class="card-panel" style="max-width: 450px; margin: 0 auto; display:none;">
                     <form id="form-abrir">
                         <div class="form-group">
@@ -34,6 +34,7 @@
                     </form>
                 </div>
 
+                <!-- Secao: Fechar Caixa -->
                 <div id="secao-fechar" class="card-panel" style="max-width: 500px; margin: 0 auto; display:none;">
                     <h3>Fechamento de caixa</h3>
                     <form id="form-fechar" style="margin-top: 15px;">
@@ -47,6 +48,58 @@
                         </div>
                         <button type="submit" class="btn-primary" style="width: 100%;">Confirmar fechamento</button>
                     </form>
+                </div>
+
+                <!-- Secao: Registrar Saida -->
+                <div id="secao-saida" class="card-panel" style="max-width: 500px; margin: 0 auto; display: none;">
+                    <h3>REGISTRAR SAÍDA</h3>
+                    <form id="form-saida" style="margin-top: 15px;">
+                        <div class="form-group">
+                            <label>Categoria</label>
+                            <select id="saida-categoria" class="form-control">
+                                <option>Despesa com produtos (insumos)</option>
+                                <option>Despesas administrativas</option>
+                                <option>Despesas operacionais</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Descrição</label>
+                            <input type="text" id="saida-descricao" class="form-control" placeholder="Ex: Compra de farinha">
+                        </div>
+                        <div class="form-group">
+                            <label>Valor (R$)</label>
+                            <input type="number" step="0.01" id="saida-valor" class="form-control" placeholder="R$ 0,00" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Forma de pagamento</label>
+                            <select id="saida-forma" class="form-control">
+                                <option>Dinheiro</option>
+                                <option>PIX</option>
+                                <option>Cartão</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Retirado de:</label>
+                            <input type="text" id="saida-origem" class="form-control" value="Caixa" readonly>
+                        </div>
+                        <button type="submit" class="btn-primary" style="width: 100%;">Registrar saída</button>
+                    </form>
+                </div>
+
+                <!-- Secao: Fluxo de Caixa -->
+                <div id="secao-fluxo" class="card-panel" style="display: none;">
+                    <h3>Fluxo de caixa (Abril a setembro de 2026)</h3>
+                    <div style="overflow-x: auto; margin-top: 15px;">
+                        <table class="table-custom">
+                            <thead>
+                                <tr id="tr-header-fluxo">
+                                    <th>Fluxo de caixa</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tb-body-fluxo">
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
 
             </div>

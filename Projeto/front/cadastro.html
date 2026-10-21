@@ -4,6 +4,32 @@
     <meta charset="UTF-8">
     <title>Cadastro - SABOREAL</title>
     <link rel="stylesheet" href="style.css">
+    <style>
+        .box-ajuste {
+            display: flex;
+            gap: 5px;
+            align-items: center;
+        }
+        .input-ajuste {
+            width: 70px !important;
+            padding: 4px 6px !important;
+            font-size: 0.85rem;
+            text-align: center;
+        }
+        .btn-confirmar-est {
+            background-color: #8D6E63;
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            border-radius: 4px;
+            font-weight: bold;
+            font-size: 0.8rem;
+            cursor: pointer;
+        }
+        .btn-confirmar-est:hover {
+            background-color: #6D4C41;
+        }
+    </style>
 </head>
 <body>
     <div class="app-container">
@@ -18,7 +44,15 @@
                     <div>
                         <table class="table-custom">
                             <thead>
-                                <tr><th>Cód.</th><th>Produto</th><th>Categoria</th><th>Preço</th><th>Estoque</th><th>Status</th></tr>
+                                <tr>
+                                    <th>Cód.</th>
+                                    <th>Produto</th>
+                                    <th>Categoria</th>
+                                    <th>Preço</th>
+                                    <th>Estoque</th>
+                                    <th style="width: 170px;">Adicionar/Retirar</th>
+                                    <th>Status</th>
+                                </tr>
                             </thead>
                             <tbody id="tb-produtos"></tbody>
                         </table>
@@ -31,7 +65,7 @@
                             <div class="form-group"><label>Nome</label><input type="text" id="p-nome" class="form-control" required></div>
                             <div class="form-group"><label>Categoria</label><input type="text" id="p-cat" class="form-control" required></div>
                             <div class="form-group"><label>Preço de venda</label><input type="number" step="0.01" id="p-preco" class="form-control" required></div>
-                            <div class="form-group"><label>Estoque</label><input type="number" id="p-estoque" class="form-control" required></div>
+                            <div class="form-group"><label>Estoque Inicial</label><input type="number" id="p-estoque" class="form-control" value="0" required></div>
                             <button type="submit" class="btn-primary" style="width: 100%;">Salvar produto</button>
                         </form>
                     </div>
@@ -47,8 +81,43 @@
             const tbody = document.getElementById('tb-produtos');
             tbody.innerHTML = '';
             prods.forEach(p => {
-                tbody.innerHTML += `<tr><td>${p.codigo}</td><td>${p.nome}</td><td>${p.categoria}</td><td>R$ ${p.preco_venda.toFixed(2)}</td><td>${p.estoque}</td><td><span class="status-badge">${p.status}</span></td></tr>`;
+                const corEstoque = p.estoque < 0 ? 'style="color:red; font-weight:bold;"' : '';
+                tbody.innerHTML += `
+                    <tr>
+                        <td>${p.codigo}</td>
+                        <td>${p.nome}</td>
+                        <td>${p.categoria}</td>
+                        <td>R$ ${p.preco_venda.toFixed(2)}</td>
+                        <td ${corEstoque}>${p.estoque}</td>
+                        <td>
+                            <div class="box-ajuste">
+                                <input type="number" id="inp-est-${p.codigo}" class="form-control input-ajuste" placeholder="Ex: 50 ou -10">
+                                <button class="btn-confirmar-est" onclick="enviarAjusteEstoque('${p.codigo}')">OK</button>
+                            </div>
+                        </td>
+                        <td><span class="status-badge">${p.status}</span></td>
+                    </tr>
+                `;
             });
+        }
+
+        async function enviarAjusteEstoque(codigo) {
+            const input = document.getElementById(`inp-est-${codigo}`);
+            const qtd = parseInt(input.value);
+
+            if (isNaN(qtd) || qtd === 0) {
+                alert('Digite um número para adicionar (ex: 50) ou retirar (ex: -10).');
+                return;
+            }
+
+            const res = await apiRequest('/produtos/estoque', 'POST', {
+                codigo: codigo,
+                quantidade: qtd
+            });
+
+            if (res && res.sucesso) {
+                carregarProdutos();
+            }
         }
 
         document.getElementById('form-produto').addEventListener('submit', async (e) => {
@@ -61,7 +130,7 @@
                 estoque: parseInt(document.getElementById('p-estoque').value)
             });
             if (res && res.sucesso) {
-                alert('Produto cadastrado!');
+                alert('Produto cadastrado com sucesso!');
                 carregarProdutos();
             }
         });

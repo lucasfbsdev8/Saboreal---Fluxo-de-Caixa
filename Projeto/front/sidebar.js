@@ -3,6 +3,8 @@ document.addEventListener('DOMContentLoaded', () => {
     if (!container) return;
 
     const path = window.location.pathname.split('/').pop();
+    const params = new URLSearchParams(window.location.search);
+    const aba = params.get('aba');
     const usuario = localStorage.getItem('usuario') || 'Gerência';
 
     container.innerHTML = `
@@ -28,12 +30,22 @@ document.addEventListener('DOMContentLoaded', () => {
                     </li>
                     <li class="${path === 'vendas.html' ? 'active' : ''}">
                         <a href="vendas.html">🛒 Vendas</a>
+                        ${path === 'vendas.html' ? `
+                        <ul class="sub-menu">
+                            <li><a href="vendas.html">Entradas</a></li>
+                            <li><a href="caixa.html?aba=saida">Saídas</a></li>
+                        </ul>` : ''}
                     </li>
                     <li class="${path === 'cadastro.html' ? 'active' : ''}">
                         <a href="cadastro.html">➕ Cadastro</a>
                     </li>
                     <li class="${path === 'relatorios.html' ? 'active' : ''}">
                         <a href="relatorios.html">📊 Relatórios</a>
+                        ${path === 'relatorios.html' ? `
+                        <ul class="sub-menu">
+                            <li><a href="relatorios.html?aba=dashboard">Dashboard</a></li>
+                            <li><a href="relatorios.html?aba=historico">Histórico de vendas</a></li>
+                        </ul>` : ''}
                     </li>
                 </ul>
             </div>
