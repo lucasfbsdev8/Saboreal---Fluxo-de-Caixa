@@ -2,34 +2,8 @@
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
-    <title>Cadastro - SABOREAL</title>
+    <title>Cadastro de Produtos - SABOREAL</title>
     <link rel="stylesheet" href="style.css">
-    <style>
-        .box-ajuste {
-            display: flex;
-            gap: 5px;
-            align-items: center;
-        }
-        .input-ajuste {
-            width: 70px !important;
-            padding: 4px 6px !important;
-            font-size: 0.85rem;
-            text-align: center;
-        }
-        .btn-confirmar-est {
-            background-color: #8D6E63;
-            color: white;
-            border: none;
-            padding: 5px 10px;
-            border-radius: 4px;
-            font-weight: bold;
-            font-size: 0.8rem;
-            cursor: pointer;
-        }
-        .btn-confirmar-est:hover {
-            background-color: #6D4C41;
-        }
-    </style>
 </head>
 <body>
     <div class="app-container">
@@ -49,9 +23,7 @@
                                     <th>Produto</th>
                                     <th>Categoria</th>
                                     <th>Preço</th>
-                                    <th>Estoque</th>
-                                    <th style="width: 170px;">Adicionar/Retirar</th>
-                                    <th>Status</th>
+                                    <th>Ações</th>
                                 </tr>
                             </thead>
                             <tbody id="tb-produtos"></tbody>
@@ -59,14 +31,21 @@
                     </div>
 
                     <div class="card-panel">
-                        <h3>Novo produto</h3>
+                        <h3 id="form-titulo">Novo produto</h3>
                         <form id="form-produto" style="margin-top: 10px;">
-                            <div class="form-group"><label>Código</label><input type="text" id="p-cod" class="form-control" required></div>
+                            <div class="form-group">
+                                <label>Código (Automático)</label>
+                                <input type="text" id="p-cod" class="form-control" readonly style="background-color: #E0E0E0; font-weight: bold;">
+                            </div>
                             <div class="form-group"><label>Nome</label><input type="text" id="p-nome" class="form-control" required></div>
                             <div class="form-group"><label>Categoria</label><input type="text" id="p-cat" class="form-control" required></div>
-                            <div class="form-group"><label>Preço de venda</label><input type="number" step="0.01" id="p-preco" class="form-control" required></div>
-                            <div class="form-group"><label>Estoque Inicial</label><input type="number" id="p-estoque" class="form-control" value="0" required></div>
-                            <button type="submit" class="btn-primary" style="width: 100%;">Salvar produto</button>
+                            <div class="form-group"><label>Preço de venda (R\$)</label><input type="number" step="0.01" id="p-preco" class="form-control" required></div>
+                            <div class="form-group" id="box-estoque-inicial">
+                                <label>Estoque Inicial</label>
+                                <input type="number" id="p-estoque" class="form-control" value="0">
+                            </div>
+                            <button type="submit" class="btn-primary" id="btn-salvar-prod" style="width: 100%;">Salvar produto</button>
+                            <button type="button" class="btn-primary" id="btn-cancelar-edit" style="width: 100%; margin-top: 8px; background-color: #757575; display: none;" onclick="resetarFormulario()">Cancelar Edição</button>
                         </form>
                     </div>
                 </div>
@@ -76,62 +55,86 @@
     <script src="api.js"></script>
     <script src="sidebar.js"></script>
     <script>
+        let produtosCache = [];
+        let modoEdicao = false;
+
         async function carregarProdutos() {
-            const prods = await apiRequest('/produtos') || [];
+            const res = await apiRequest('/produtos') || { produtos: [], proximo_codigo: '01' };
+            produtosCache = res.produtos;
+            
             const tbody = document.getElementById('tb-produtos');
             tbody.innerHTML = '';
-            prods.forEach(p => {
-                const corEstoque = p.estoque < 0 ? 'style="color:red; font-weight:bold;"' : '';
+            produtosCache.forEach(p => {
                 tbody.innerHTML += `
                     <tr>
-                        <td>${p.codigo}</td>
+                        <td><strong>${p.codigo}</strong></td>
                         <td>${p.nome}</td>
                         <td>${p.categoria}</td>
                         <td>R$ ${p.preco_venda.toFixed(2)}</td>
-                        <td ${corEstoque}>${p.estoque}</td>
                         <td>
-                            <div class="box-ajuste">
-                                <input type="number" id="inp-est-${p.codigo}" class="form-control input-ajuste" placeholder="Ex: 50 ou -10">
-                                <button class="btn-confirmar-est" onclick="enviarAjusteEstoque('${p.codigo}')">OK</button>
-                            </div>
+                            <button class="btn-primary" style="padding: 4px 10px; font-size: 0.8rem; background-color: #8D6E63;" onclick="prepararEdicao('${p.codigo}')">✏️ Editar</button>
                         </td>
-                        <td><span class="status-badge">${p.status}</span></td>
                     </tr>
                 `;
             });
+
+            if (!modoEdicao) {
+                document.getElementById('p-cod').value = res.proximo_codigo;
+            }
         }
 
-        async function enviarAjusteEstoque(codigo) {
-            const input = document.getElementById(`inp-est-${codigo}`);
-            const qtd = parseInt(input.value);
+        function prepararEdicao(codigo) {
+            const prod = produtosCache.find(p => p.codigo === codigo);
+            if (!prod) return;
 
-            if (isNaN(qtd) || qtd === 0) {
-                alert('Digite um número para adicionar (ex: 50) ou retirar (ex: -10).');
-                return;
-            }
+            modoEdicao = true;
+            document.getElementById('form-titulo').textContent = `Editar Produto (${prod.codigo})`;
+            document.getElementById('p-cod').value = prod.codigo;
+            document.getElementById('p-nome').value = prod.nome;
+            document.getElementById('p-cat').value = prod.categoria;
+            document.getElementById('p-preco').value = prod.preco_venda;
+            
+            document.getElementById('box-estoque-inicial').style.display = 'none';
+            document.getElementById('btn-salvar-prod').textContent = 'Atualizar produto';
+            document.getElementById('btn-cancelar-edit').style.display = 'block';
+        }
 
-            const res = await apiRequest('/produtos/estoque', 'POST', {
-                codigo: codigo,
-                quantidade: qtd
-            });
-
-            if (res && res.sucesso) {
-                carregarProdutos();
-            }
+        function resetarFormulario() {
+            modoEdicao = false;
+            document.getElementById('form-titulo').textContent = 'Novo produto';
+            document.getElementById('form-produto').reset();
+            document.getElementById('box-estoque-inicial').style.display = 'block';
+            document.getElementById('btn-salvar-prod').textContent = 'Salvar produto';
+            document.getElementById('btn-cancelar-edit').style.display = 'none';
+            carregarProdutos();
         }
 
         document.getElementById('form-produto').addEventListener('submit', async (e) => {
             e.preventDefault();
-            const res = await apiRequest('/produtos', 'POST', {
-                codigo: document.getElementById('p-cod').value,
-                nome: document.getElementById('p-nome').value,
-                categoria: document.getElementById('p-cat').value,
-                preco_venda: parseFloat(document.getElementById('p-preco').value),
-                estoque: parseInt(document.getElementById('p-estoque').value)
-            });
-            if (res && res.sucesso) {
-                alert('Produto cadastrado com sucesso!');
-                carregarProdutos();
+            
+            if (modoEdicao) {
+                const res = await apiRequest('/produtos', 'PUT', {
+                    codigo: document.getElementById('p-cod').value,
+                    nome: document.getElementById('p-nome').value,
+                    categoria: document.getElementById('p-cat').value,
+                    preco_venda: parseFloat(document.getElementById('p-preco').value)
+                });
+                if (res && res.sucesso) {
+                    alert('Produto atualizado com sucesso!');
+                    resetarFormulario();
+                }
+            } else {
+                const res = await apiRequest('/produtos', 'POST', {
+                    codigo: document.getElementById('p-cod').value,
+                    nome: document.getElementById('p-nome').value,
+                    categoria: document.getElementById('p-cat').value,
+                    preco_venda: parseFloat(document.getElementById('p-preco').value),
+                    estoque: parseInt(document.getElementById('p-estoque').value) || 0
+                });
+                if (res && res.sucesso) {
+                    alert('Produto cadastrado com sucesso!');
+                    resetarFormulario();
+                }
             }
         });
 

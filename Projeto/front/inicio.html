@@ -4,6 +4,58 @@
     <meta charset="UTF-8">
     <title>Início - SABOREAL</title>
     <link rel="stylesheet" href="style.css">
+    <style>
+        .status-box {
+            background-color: #B5A992;
+            border-radius: 12px;
+            padding: 30px;
+            text-align: center;
+            max-width: 520px;
+            margin: 30px auto;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+
+        .status-badge-large {
+            display: inline-block;
+            padding: 10px 25px;
+            border-radius: 25px;
+            font-size: 1.4rem;
+            font-weight: bold;
+            color: white;
+            margin-bottom: 20px;
+        }
+
+        .bg-fechado { background-color: #C02E28; }
+        .bg-aberto { background-color: #2E7D32; }
+
+        .action-buttons {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin-top: 25px;
+        }
+
+        .action-buttons.single-col {
+            grid-template-columns: 1fr;
+        }
+
+        .btn-action {
+            padding: 14px;
+            font-size: 1rem;
+            border-radius: 8px;
+            border: none;
+            font-weight: bold;
+            cursor: pointer;
+            text-decoration: none;
+            color: white;
+            text-align: center;
+            transition: opacity 0.2s;
+        }
+
+        .btn-action:hover {
+            opacity: 0.9;
+        }
+    </style>
 </head>
 <body>
     <div class="app-container">
@@ -11,27 +63,24 @@
         <div class="main-content">
             <div class="top-bar">
                 <h2>Início</h2>
-                <div class="user-info">👤 <span id="lbl-usuario">Gerência</span></div>
+                <div class="user-info">👤 Gerência</div>
             </div>
             <div class="page-body">
-                <p style="margin-bottom: 20px;">Olá, aqui está o resumo de hoje.</p>
-                <div class="cards-grid">
-                    <div class="metric-card">
-                        <h4>Faturamento hoje</h4>
-                        <div class="value" id="val-faturamento">R$ 0,00</div>
-                        <div class="subtext">em relação a ontem</div>
+                
+                <div class="status-box">
+                    <div id="badge-caixa" class="status-badge-large bg-fechado">
+                        CAIXA FECHADO
                     </div>
-                    <div class="metric-card">
-                        <h4>Vendas hoje</h4>
-                        <div class="value" id="val-vendas">0 vendas</div>
-                        <div class="subtext" style="color: #D9534F;">em relação a ontem</div>
-                    </div>
-                    <div class="metric-card">
-                        <h4>Dinheiro em caixa</h4>
-                        <div class="value" id="val-caixa">R$ 0,00</div>
-                        <div class="subtext">em relação ao mês passado</div>
+
+                    <p id="info-caixa" style="color: #3E2723; font-size: 1.05rem; line-height: 1.5;">
+                        O caixa está fechado no momento. Abra o caixa para realizar vendas e movimentações.
+                    </p>
+
+                    <div class="action-buttons" id="box-botoes">
+                        <!-- Renderizado via JS -->
                     </div>
                 </div>
+
             </div>
         </div>
     </div>
@@ -40,11 +89,33 @@
     <script src="sidebar.js"></script>
     <script>
         document.addEventListener('DOMContentLoaded', async () => {
-            const res = await apiRequest('/dashboard/resumo');
-            if (res) {
-                document.getElementById('val-faturamento').textContent = `R$ ${res.faturamento_hoje.toFixed(2)}`;
-                document.getElementById('val-vendas').textContent = `${res.vendas_hoje} vendas`;
-                document.getElementById('val-caixa').textContent = `R$ ${res.dinheiro_caixa.toFixed(2)}`;
+            const status = await apiRequest('/caixa/status') || { aberto: false };
+            const badge = document.getElementById('badge-caixa');
+            const info = document.getElementById('info-caixa');
+            const box = document.getElementById('box-botoes');
+
+            if (status.aberto) {
+                badge.textContent = "CAIXA ABERTO";
+                badge.className = "status-badge-large bg-aberto";
+                info.innerHTML = `<strong>Operador:</strong> ${status.dados.operador}<br><strong>Valor Abertura:</strong> R$ ${status.dados.valor_abertura.toFixed(2)}`;
+                
+                box.className = "action-buttons"; // Grid de 2 colunas
+                box.innerHTML = `
+                    <a href="vendas.html" class="btn-action" style="background-color: #2E7D32;">🛒 Nova Venda</a>
+                    <a href="estoque.html" class="btn-action" style="background-color: #8D6E63;">📦 Adicionar Estoque</a>
+                    <a href="relatorios.html" class="btn-action" style="background-color: #3E2723;">📊 Ver Relatórios</a>
+                    <a href="caixa.html?aba=fechar" class="btn-action" style="background-color: #C02E28;">🔒 Fechar Caixa</a>
+                `;
+            } else {
+                badge.textContent = "CAIXA FECHADO";
+                badge.className = "status-badge-large bg-fechado";
+                info.textContent = "O caixa está fechado no momento. Abra o caixa para liberar vendas e movimentações.";
+                
+                box.className = "action-buttons single-col"; // 1 coluna
+                box.innerHTML = `
+                    <a href="caixa.html?aba=abrir" class="btn-action" style="background-color: #2E7D32;">🔑 Abrir Caixa</a>
+                    <a href="relatorios.html" class="btn-action" style="background-color: #8D6E63;">📊 Ver Relatórios</a>
+                `;
             }
         });
     </script>

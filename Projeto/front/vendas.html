@@ -13,7 +13,6 @@
             height: calc(100vh - 120px);
         }
 
-        /* Lado Esquerdo: Grid de Produtos */
         .pos-products-section {
             display: flex;
             flex-direction: column;
@@ -96,7 +95,6 @@
             background-color: #6D4C41;
         }
 
-        /* Lado Direito: Carrinho / Resumo da Venda */
         .pos-cart-section {
             background-color: #B5A992;
             border-radius: 10px;
@@ -164,7 +162,6 @@
             background-color: #BDBDBD;
         }
 
-        /* Input editável de quantidade no carrinho */
         .input-cart-qty {
             width: 48px;
             height: 26px;
@@ -175,12 +172,6 @@
             border-radius: 4px;
             padding: 0;
             outline: none;
-        }
-
-        .input-cart-qty::-webkit-inner-spin-button, 
-        .input-cart-qty::-webkit-outer-spin-button { 
-            -webkit-appearance: none;
-            margin: 0;
         }
 
         .cart-summary {
@@ -203,7 +194,6 @@
             margin-top: 10px;
         }
 
-        /* Modal de Finalização */
         .modal-overlay {
             position: fixed;
             top: 0; left: 0; right: 0; bottom: 0;
@@ -235,7 +225,6 @@
             <div class="page-body">
                 <div class="pos-container">
                     
-                    <!-- Lado Esquerdo: Produtos em Cards -->
                     <div class="pos-products-section">
                         <div class="search-bar-container">
                             <input type="text" id="inp-busca-prod" class="form-control" placeholder="🔍 Buscar produto por nome ou código..." oninput="filtrarProdutos()">
@@ -245,7 +234,6 @@
                         </div>
                     </div>
 
-                    <!-- Lado Direito: Carrinho de Compras -->
                     <div class="pos-cart-section">
                         <div>
                             <div class="cart-header">🛒 Carrinho de Venda</div>
@@ -272,7 +260,6 @@
         </div>
     </div>
 
-    <!-- Modal de Finalização / Pagamento -->
     <div class="modal-overlay" id="modal-pagamento">
         <div class="modal-card">
             <h3 style="color: #3E2723; margin-bottom: 20px;">Finalizar Venda</h3>

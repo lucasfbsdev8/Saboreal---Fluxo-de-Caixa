@@ -8,47 +8,47 @@ document.addEventListener('DOMContentLoaded', () => {
     const secFluxo = document.getElementById('secao-fluxo');
     const titulo = document.getElementById('titulo-pagina');
 
-    secAbrir.style.display = 'none';
-    secFechar.style.display = 'none';
-    secSaida.style.display = 'none';
-    secFluxo.style.display = 'none';
+    if (secAbrir) secAbrir.style.display = 'none';
+    if (secFechar) secFechar.style.display = 'none';
+    if (secSaida) secSaida.style.display = 'none';
+    if (secFluxo) secFluxo.style.display = 'none';
 
     if (aba === 'fechar') {
-        titulo.textContent = 'FECHAR CAIXA';
-        secFechar.style.display = 'block';
+        if (titulo) titulo.textContent = 'FECHAR CAIXA';
+        if (secFechar) secFechar.style.display = 'block';
     } else if (aba === 'saida') {
-        titulo.textContent = 'REGISTRAR SAÍDA';
-        secSaida.style.display = 'block';
+        if (titulo) titulo.textContent = 'REGISTRAR SAÍDA';
+        if (secSaida) secSaida.style.display = 'block';
     } else if (aba === 'fluxo') {
-        titulo.textContent = 'FLUXO DE CAIXA';
-        secFluxo.style.display = 'block';
+        if (titulo) titulo.textContent = 'FLUXO DE CAIXA';
+        if (secFluxo) secFluxo.style.display = 'block';
         carregarFluxoCaixa();
     } else {
-        titulo.textContent = 'ABRIR CAIXA';
-        secAbrir.style.display = 'block';
+        if (titulo) titulo.textContent = 'ABRIR CAIXA';
+        if (secAbrir) secAbrir.style.display = 'block';
     }
-
-    document.getElementById('form-abrir')?.addEventListener('submit', async (e) => {
-        e.preventDefault();
-        const res = await apiRequest('/caixa/abrir', 'POST', {
-            operador: document.getElementById('abrir-operador').value,
-            valor_abertura: parseFloat(document.getElementById('abrir-valor').value),
-            observacao: document.getElementById('abrir-obs').value
-        });
-        if (res && res.sucesso) {
-            alert('Caixa aberto!');
-            window.location.href = 'vendas.html';
-        }
-    });
 
     document.getElementById('form-fechar')?.addEventListener('submit', async (e) => {
         e.preventDefault();
+        const valorInformado = parseFloat(document.getElementById('fechar-valor').value);
+        let obsManual = document.getElementById('fechar-obs').value;
+
+        const status = await apiRequest('/caixa/status') || {};
+        const valorEsperado = status.valor_calculado_fechamento || 0.0;
+        const diff = valorInformado - valorEsperado;
+
+        let obsFinal = obsManual;
+        if (Math.abs(diff) >= 0.01) {
+            const tipoDiv = diff < 0 ? `Quebra: -R$ ${Math.abs(diff).toFixed(2)}` : `Sobra: +R$ ${diff.toFixed(2)}`;
+            obsFinal = obsManual ? `${obsManual} | ${tipoDiv}` : tipoDiv;
+        }
+
         const res = await apiRequest('/caixa/fechar', 'POST', {
-            valor_fechamento: parseFloat(document.getElementById('fechar-valor').value),
-            observacao: document.getElementById('fechar-obs').value
+            valor_fechamento: valorInformado,
+            observacao: obsFinal
         });
         if (res && res.sucesso) {
-            alert('Caixa fechado com sucesso!');
+            alert('✅ Caixa fechado com sucesso!');
             window.location.href = 'inicio.html';
         }
     });
@@ -64,8 +64,8 @@ document.addEventListener('DOMContentLoaded', () => {
             retirado_de: document.getElementById('saida-origem').value
         });
         if (res && res.sucesso) {
-            alert('Saída registrada com sucesso!');
-            window.location.href = 'vendas.html';
+            alert('✅ Saída registrada com sucesso!');
+            window.location.href = 'inicio.html';
         }
     });
 });
@@ -75,14 +75,13 @@ async function carregarFluxoCaixa() {
     const trHeader = document.getElementById('tr-header-fluxo');
     const tbBody = document.getElementById('tb-body-fluxo');
 
-    if (fluxos.length === 0) return;
+    if (!trHeader || !tbBody || fluxos.length === 0) return;
 
-    // Preenche cabeçalho de meses
+    trHeader.innerHTML = '<th>Fluxo de caixa</th>';
     fluxos.forEach(f => {
         trHeader.innerHTML += `<th>${f.mes}</th>`;
     });
 
-    // Monta as linhas de dados do protótipo
     const linhas = [
         { label: 'Lucro', key: 'lucro', destaque: true },
         { label: 'Saldo Final', key: 'saldo' },

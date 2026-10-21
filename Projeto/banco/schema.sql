@@ -49,7 +49,7 @@ CREATE TABLE IF NOT EXISTS itens_venda (
 
 CREATE TABLE IF NOT EXISTS movimentacoes_caixa (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
-    tipo TEXT NOT NULL, -- 'ENTRADA' ou 'SAIDA'
+    tipo TEXT NOT NULL,
     categoria TEXT NOT NULL,
     descricao TEXT,
     valor REAL NOT NULL,
@@ -68,7 +68,7 @@ CREATE TABLE IF NOT EXISTS fluxo_caixa_mensal (
     saldo REAL NOT NULL
 );
 
--- Carga Inicial de Dados
+-- Carga Inicial Apenas de Usuarios e Produtos
 INSERT OR IGNORE INTO usuarios (usuario, senha, cargo) VALUES ('admin', '1234', 'Gerência');
 
 INSERT OR IGNORE INTO produtos (codigo, nome, categoria, preco_venda, estoque) VALUES 
@@ -78,7 +78,6 @@ INSERT OR IGNORE INTO produtos (codigo, nome, categoria, preco_venda, estoque) V
 ('04', 'Sonho', 'Doces', 2.50, 7),
 ('05', 'Pudim', 'Pudim', 10.00, 2);
 
--- Dados mockados do Fluxo de Caixa (Abril a Setembro)
 INSERT OR IGNORE INTO fluxo_caixa_mensal (id, mes, saldo_inicial, entradas, saidas, lucro, saldo) VALUES
 (1, 'Abril', 6057.70, 15328.00, 6195.20, 9132.80, 15190.50),
 (2, 'Maio', 15190.50, 13890.00, 6047.80, 7842.20, 23032.70),

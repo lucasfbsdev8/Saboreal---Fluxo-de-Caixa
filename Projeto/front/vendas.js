@@ -6,26 +6,38 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 async function carregarProdutosPDV() {
-    produtosCache = await apiRequest('/produtos') || [];
+    const res = await apiRequest('/produtos');
+    
+    // Tratamento para ler tanto o formato objeto { produtos: [...] } quanto lista simples [...]
+    if (res && res.produtos && Array.isArray(res.produtos)) {
+        produtosCache = res.produtos;
+    } else if (Array.isArray(res)) {
+        produtosCache = res;
+    } else {
+        produtosCache = [];
+    }
+
     renderizarGridProdutos(produtosCache);
 }
 
 function renderizarGridProdutos(produtos) {
     const grid = document.getElementById('grid-produtos');
+    if (!grid) return;
+
     grid.innerHTML = '';
 
-    if (produtos.length === 0) {
-        grid.innerHTML = '<p style="grid-column: 1/-1; text-align: center;">Nenhum produto encontrado.</p>';
+    if (!produtos || produtos.length === 0) {
+        grid.innerHTML = '<p style="grid-column: 1/-1; text-align: center; color: #5D4037; font-weight: bold;">Nenhum produto cadastrado ou encontrado.</p>';
         return;
     }
 
     produtos.forEach(p => {
         grid.innerHTML += `
             <div class="product-card" onclick="adicionarAoCarrinho('${p.codigo}')">
-                <img src="imagens/logo.png" alt="Produto">
+                <img src="imagens/logo.png" alt="${p.nome}">
                 <h4>${p.nome}</h4>
-                <div class="price">R$ ${p.preco_venda.toFixed(2)}</div>
-                <div class="stock-tag">Estoque: ${p.estoque}</div>
+                <div class="price">R$ ${parseFloat(p.preco_venda).toFixed(2)}</div>
+                <div class="stock-tag">Estoque: ${p.estoque} un.</div>
                 <button class="btn-add-item">+ Adicionar</button>
             </div>
         `;
@@ -60,7 +72,7 @@ function adicionarAoCarrinho(codigo) {
         carrinho.push({
             codigo: produto.codigo,
             nome: produto.nome,
-            preco: produto.preco_venda,
+            preco: parseFloat(produto.preco_venda),
             quantidade: 1
         });
     }
@@ -97,6 +109,8 @@ function definirQuantidadeDireta(codigo, novaQtd) {
 
 function atualizarCarrinhoUI() {
     const lista = document.getElementById('lista-carrinho');
+    if (!lista) return;
+
     lista.innerHTML = '';
 
     if (carrinho.length === 0) {
@@ -126,7 +140,6 @@ function atualizarCarrinhoUI() {
                            class="input-cart-qty" 
                            value="${item.quantidade}" 
                            min="1" 
-                           max="${item.preco}"
                            onchange="definirQuantidadeDireta('${item.codigo}', this.value)"
                            onclick="this.select()">
                     <button class="btn-qty" onclick="alterarQuantidade('${item.codigo}', 1)">+</button>

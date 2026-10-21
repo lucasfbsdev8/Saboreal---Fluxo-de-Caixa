@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <title>Gestão de Estoque - SABOREAL</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        .box-ajuste {
+            display: flex;
+            gap: 6px;
+            align-items: center;
+        }
+        .input-ajuste {
+            width: 80px !important;
+            padding: 6px !important;
+            font-size: 0.9rem;
+            text-align: center;
+        }
+        .btn-confirmar-est {
+            background-color: #8D6E63;
+            color: white;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 4px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+        .btn-confirmar-est:hover {
+            background-color: #6D4C41;
+        }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <div id="sidebar-container"></div>
+        <div class="main-content">
+            <div class="top-bar">
+                <h2>Adicionar Estoque</h2>
+                <div class="user-info">👤 Gerência</div>
+            </div>
+            <div class="page-body">
+                <div class="card-panel">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+                        <h3>Controle de Quantidades</h3>
+                        <input type="text" id="inp-busca" class="form-control" style="width: 300px;" placeholder="🔍 Buscar por código ou nome..." oninput="filtrarTabela()">
+                    </div>
+
+                    <table class="table-custom">
+                        <thead>
+                            <tr>
+                                <th>Cód.</th>
+                                <th>Produto</th>
+                                <th>Categoria</th>
+                                <th>Estoque Atual</th>
+                                <th>Ajustar Estoque (+ / -)</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tb-estoque"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script src="api.js"></script>
+    <script src="sidebar.js"></script>
+    <script>
+        let produtosEstoque = [];
+
+        async function carregarEstoque() {
+            const res = await apiRequest('/produtos') || { produtos: [] };
+            produtosEstoque = res.produtos;
+            renderizarTabela(produtosEstoque);
+        }
+
+        function renderizarTabela(lista) {
+            const tbody = document.getElementById('tb-estoque');
+            tbody.innerHTML = '';
+            
+            if (lista.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;">Nenhum produto encontrado.</td></tr>';
+                return;
+            }
+
+            lista.forEach(p => {
+                const corEstoque = p.estoque <= 0 ? 'style="color:red; font-weight:bold;"' : 'style="font-weight:bold;"';
+                tbody.innerHTML += `
+                    <tr>
+                        <td><strong>${p.codigo}</strong></td>
+                        <td>${p.nome}</td>
+                        <td>${p.categoria}</td>
+                        <td ${corEstoque}>${p.estoque} un.</td>
+                        <td>
+                            <div class="box-ajuste">
+                                <input type="number" id="inp-est-${p.codigo}" class="form-control input-ajuste" placeholder="Ex: 20 ou -5">
+                                <button class="btn-confirmar-est" onclick="enviarAjusteEstoque('${p.codigo}')">Confirmar</button>
+                            </div>
+                        </td>
+                    </tr>
+                `;
+            });
+        }
+
+        function filtrarTabela() {
+            const termo = document.getElementById('inp-busca').value.toLowerCase();
+            const filtrados = produtosEstoque.filter(p => 
+                p.nome.toLowerCase().includes(termo) || p.codigo.toLowerCase().includes(termo)
+            );
+            renderizarTabela(filtrados);
+        }
+
+        async function enviarAjusteEstoque(codigo) {
+            const input = document.getElementById(`inp-est-${codigo}`);
+            const qtd = parseInt(input.value);
+
+            if (isNaN(qtd) || qtd === 0) {
+                alert('Digite um número para adicionar (ex: 20) ou retirar (ex: -5).');
+                return;
+            }
+
+            const res = await apiRequest('/produtos/estoque', 'POST', {
+                codigo: codigo,
+                quantidade: qtd
+            });
+
+            if (res && res.sucesso) {
+                alert('Estoque atualizado com sucesso!');
+                carregarEstoque();
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', carregarEstoque);
+    </script>
+</body>
+</html>
