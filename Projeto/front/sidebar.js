@@ -11,7 +11,7 @@ document.addEventListener('DOMContentLoaded', () => {
         <div class="sidebar">
             <div>
                 <div class="brand">
-                    <div style="font-size: 35px;">👨‍🍳</div>
+                    <img src="imagens/logo.png" alt="Logo Saboreal" style="width: 50px; height: auto; margin-bottom: 5px;">
                     <h1>SABOREAL</h1>
                     <p>BISCOITOS CASEIROS</p>
                 </div>

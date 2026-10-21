@@ -2,30 +2,189 @@
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login - SABOREAL</title>
     <link rel="stylesheet" href="style.css">
     <style>
-        body { background-color: #4A3525; display: flex; justify-content: center; align-items: center; height: 100vh; }
-        .login-card { background-color: #B5A992; padding: 35px; border-radius: 12px; width: 300px; text-align: center; }
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Arial, sans-serif;
+        }
+
+        body, html {
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+        }
+
+        .login-container {
+            display: flex;
+            width: 100vw;
+            height: 100vh;
+        }
+
+        /* Lado Esquerdo: Banner com a Imagem de Fundo e Layout */
+        .banner-container {
+            flex: 1.6;
+            background: url('imagens/fundo.png') no-repeat center center;
+            background-size: cover;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            padding: 50px 60px;
+        }
+
+        .brand-header-left {
+            display: flex;
+            justify-content: flex-end; /* Alinha a logo escrita à direita para não cobrir a cesta de pães */
+            padding-right: 40px;
+            padding-top: 10px;
+        }
+
+        .logo-escrita-img {
+            max-width: 320px;
+            height: auto;
+            object-fit: contain;
+        }
+
+        .system-title-bottom {
+            font-size: 2.8rem;
+            font-weight: 800;
+            color: #4A3525;
+            margin-bottom: 20px;
+            margin-left: 20px;
+            letter-spacing: 0.5px;
+        }
+
+        /* Lado Direito: Formulário com Fundo Castanho Escuro */
+        .form-side {
+            flex: 1;
+            background-color: #534338; /* Castanho exato do protótipo */
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 40px;
+        }
+
+        .form-content {
+            width: 100%;
+            max-width: 320px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .chef-hat-icon {
+            width: 110px;
+            height: auto;
+            margin-bottom: 30px;
+        }
+
+        .welcome-title {
+            color: #FFFFFF;
+            font-size: 2.2rem;
+            font-weight: bold;
+            margin-bottom: 35px;
+        }
+
+        .input-group-proto {
+            width: 100%;
+            position: relative;
+            margin-bottom: 18px;
+        }
+
+        .input-group-proto input {
+            width: 100%;
+            height: 48px;
+            background-color: #E0E0E0;
+            border: none;
+            border-radius: 24px;
+            padding: 0 20px 0 45px;
+            font-size: 1.05rem;
+            color: #333;
+            outline: none;
+        }
+
+        .input-group-proto .input-icon {
+            position: absolute;
+            left: 18px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 1.1rem;
+            color: #333;
+        }
+
+        .btn-login-proto {
+            width: 100%;
+            height: 50px;
+            background-color: #C02E28; /* Vermelho do protótipo */
+            color: #FFFFFF;
+            border: none;
+            border-radius: 25px;
+            font-size: 1.3rem;
+            font-weight: bold;
+            cursor: pointer;
+            margin-top: 15px;
+            transition: background-color 0.2s;
+        }
+
+        .btn-login-proto:hover {
+            background-color: #A0231D;
+        }
+
+        /* Ajuste de responsividade */
+        @media (max-width: 850px) {
+            .banner-container {
+                display: none;
+            }
+            .form-side {
+                flex: 1;
+            }
+        }
     </style>
 </head>
 <body>
-    <div class="login-card">
-        <div style="font-size: 45px;">👨‍🍳</div>
-        <h1 style="color:#FFF;">SABOREAL</h1>
-        <p style="color:#FFF; font-size: 0.75rem; margin-bottom: 15px;">BISCOITOS CASEIROS</p>
-        <p style="font-weight: bold; margin-bottom: 15px;">Sistema de gestão<br>Bem vindo!</p>
-        <form id="form-login">
-            <div class="form-group" style="text-align: left;">
-                <label>Usuário:</label>
-                <input type="text" id="usuario" class="form-control" required>
+    <div class="login-container">
+        
+        <!-- Esquerda: Banner com Fundo, Logo Escrita e Texto do Protótipo -->
+        <div class="banner-container">
+            <div class="brand-header-left">
+                <img src="imagens/logoEscrita.png" alt="SABOREAL BISCOITOS CASEIROS" class="logo-escrita-img">
             </div>
-            <div class="form-group" style="text-align: left;">
-                <label>Senha:</label>
-                <input type="password" id="senha" class="form-control" required>
+            
+            <div class="system-title-bottom">
+                Sistema de gestão
             </div>
-            <button type="submit" class="btn-primary" style="width: 100%; margin-top: 10px;">Login</button>
-        </form>
+        </div>
+
+        <!-- Direita: Formulário de Login Castanho -->
+        <div class="form-side">
+            <div class="form-content">
+                <!-- Ícone do Chapéu de Cozinheiro -->
+                <img src="imagens/logo.png" alt="Chapéu de Cozinheiro" class="chef-hat-icon">
+
+                <div class="welcome-title">Bem vindo!</div>
+
+                <form id="form-login" style="width: 100%;">
+                    <div class="input-group-proto">
+                        <span class="input-icon">👤</span>
+                        <input type="text" id="usuario" placeholder="Usuário:" required>
+                    </div>
+
+                    <div class="input-group-proto">
+                        <span class="input-icon">🔒</span>
+                        <input type="password" id="senha" placeholder="Senha:" required>
+                    </div>
+
+                    <button type="submit" class="btn-login-proto">Login</button>
+                </form>
+            </div>
+        </div>
+
     </div>
 
     <script src="api.js"></script>
