@@ -1,13 +1,226 @@
-<!-- vendas.html -->
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
-    <title>Vendas - SABOREAL</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vendas (PDV) - SABOREAL</title>
     <link rel="stylesheet" href="style.css">
     <style>
-        .pdv-layout { display: grid; grid-template-columns: 2fr 1fr; gap: 20px; }
-        .total-display { background: #3E2723; color: white; padding: 15px; border-radius: 8px; text-align: center; font-size: 1.8rem; margin: 15px 0; }
+        .pos-container {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 20px;
+            height: calc(100vh - 120px);
+        }
+
+        /* Lado Esquerdo: Grid de Produtos */
+        .pos-products-section {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .search-bar-container {
+            display: flex;
+            gap: 10px;
+        }
+
+        .products-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+            gap: 15px;
+            overflow-y: auto;
+            padding-right: 5px;
+            max-height: calc(100vh - 180px);
+        }
+
+        .product-card {
+            background-color: #FFF;
+            border-radius: 10px;
+            padding: 15px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            align-items: center;
+            text-align: center;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+            border: 1px solid #E0E0E0;
+            transition: transform 0.15s, box-shadow 0.15s;
+            cursor: pointer;
+        }
+
+        .product-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+        }
+
+        .product-card img {
+            width: 55px;
+            height: 55px;
+            object-fit: contain;
+            margin-bottom: 10px;
+        }
+
+        .product-card h4 {
+            font-size: 0.95rem;
+            color: #3E2723;
+            margin-bottom: 4px;
+        }
+
+        .product-card .price {
+            font-weight: bold;
+            color: #2E7D32;
+            font-size: 1.1rem;
+            margin-bottom: 8px;
+        }
+
+        .product-card .stock-tag {
+            font-size: 0.75rem;
+            color: #757575;
+            margin-bottom: 10px;
+        }
+
+        .btn-add-item {
+            background-color: #8D6E63;
+            color: white;
+            border: none;
+            width: 100%;
+            padding: 8px;
+            border-radius: 6px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+
+        .btn-add-item:hover {
+            background-color: #6D4C41;
+        }
+
+        /* Lado Direito: Carrinho / Resumo da Venda */
+        .pos-cart-section {
+            background-color: #B5A992;
+            border-radius: 10px;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .cart-header {
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: #2C1D1A;
+            margin-bottom: 15px;
+            border-bottom: 2px solid #8D6E63;
+            padding-bottom: 8px;
+        }
+
+        .cart-items-list {
+            flex: 1;
+            overflow-y: auto;
+            margin-bottom: 15px;
+            padding-right: 5px;
+            max-height: calc(100vh - 360px);
+        }
+
+        .cart-item {
+            background-color: #FFF;
+            border-radius: 8px;
+            padding: 10px;
+            margin-bottom: 8px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .cart-item-info h5 {
+            font-size: 0.9rem;
+            color: #3E2723;
+            margin: 0;
+        }
+
+        .cart-item-info span {
+            font-size: 0.8rem;
+            color: #666;
+        }
+
+        .cart-item-controls {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .btn-qty {
+            background-color: #E0E0E0;
+            border: none;
+            width: 26px;
+            height: 26px;
+            border-radius: 4px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .btn-qty:hover {
+            background-color: #BDBDBD;
+        }
+
+        /* Input editável de quantidade no carrinho */
+        .input-cart-qty {
+            width: 48px;
+            height: 26px;
+            text-align: center;
+            font-size: 0.85rem;
+            font-weight: bold;
+            border: 1px solid #CCC;
+            border-radius: 4px;
+            padding: 0;
+            outline: none;
+        }
+
+        .input-cart-qty::-webkit-inner-spin-button, 
+        .input-cart-qty::-webkit-outer-spin-button { 
+            -webkit-appearance: none;
+            margin: 0;
+        }
+
+        .cart-summary {
+            border-top: 2px solid #8D6E63;
+            padding-top: 15px;
+        }
+
+        .summary-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 8px;
+            font-size: 1rem;
+            color: #2C1D1A;
+        }
+
+        .summary-row.total {
+            font-size: 1.4rem;
+            font-weight: bold;
+            color: #C02E28;
+            margin-top: 10px;
+        }
+
+        /* Modal de Finalização */
+        .modal-overlay {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0, 0, 0, 0.6);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .modal-card {
+            background: #FFF;
+            padding: 30px;
+            border-radius: 12px;
+            width: 400px;
+            max-width: 90%;
+        }
     </style>
 </head>
 <body>
@@ -15,52 +228,77 @@
         <div id="sidebar-container"></div>
         <div class="main-content">
             <div class="top-bar">
-                <h2>Vendas</h2>
+                <h2>Ponto de Venda (PDV)</h2>
                 <div class="user-info">👤 Gerência</div>
             </div>
+            
             <div class="page-body">
-                <div class="pdv-layout">
-                    <div>
-                        <div class="card-panel">
-                            <h3>F2 - Adicionar Item</h3>
-                            <div style="display: flex; gap: 10px; margin-top: 10px;">
-                                <select id="sel-produto" class="form-control"></select>
-                                <input type="number" id="inp-qtd" class="form-control" value="1" min="1" style="width: 80px;">
-                                <button id="btn-add" class="btn-primary">Enter</button>
+                <div class="pos-container">
+                    
+                    <!-- Lado Esquerdo: Produtos em Cards -->
+                    <div class="pos-products-section">
+                        <div class="search-bar-container">
+                            <input type="text" id="inp-busca-prod" class="form-control" placeholder="🔍 Buscar produto por nome ou código..." oninput="filtrarProdutos()">
+                        </div>
+                        <div class="products-grid" id="grid-produtos">
+                            <!-- Produtos renderizados via JS -->
+                        </div>
+                    </div>
+
+                    <!-- Lado Direito: Carrinho de Compras -->
+                    <div class="pos-cart-section">
+                        <div>
+                            <div class="cart-header">🛒 Carrinho de Venda</div>
+                            <div class="cart-items-list" id="lista-carrinho">
+                                <p style="text-align: center; color: #5D4037; margin-top: 20px;">Carrinho vazio</p>
                             </div>
                         </div>
 
-                        <table class="table-custom">
-                            <thead>
-                                <tr><th>CÓD</th><th>PRODUTO</th><th>QNTD</th><th>VALOR</th></tr>
-                            </thead>
-                            <tbody id="tb-carrinho"></tbody>
-                        </table>
+                        <div class="cart-summary">
+                            <div class="summary-row">
+                                <span>Itens:</span>
+                                <span id="lbl-total-itens">0</span>
+                            </div>
+                            <div class="summary-row total">
+                                <span>Total:</span>
+                                <span id="lbl-total-valor">R$ 0,00</span>
+                            </div>
+                            <button class="btn-primary" style="width: 100%; margin-top: 15px; height: 48px; font-size: 1.1rem;" onclick="abrirModalPagamento()">Finalizar Venda</button>
+                        </div>
                     </div>
 
-                    <div class="card-panel">
-                        <h3>Pagamento</h3>
-                        <div class="form-group" style="margin-top: 15px;">
-                            <label>Forma de Pagamento:</label>
-                            <select id="sel-forma" class="form-control">
-                                <option value="Dinheiro">Dinheiro</option>
-                                <option value="PIX">PIX</option>
-                                <option value="Crédito">Crédito</option>
-                                <option value="Débito">Débito</option>
-                            </select>
-                        </div>
-
-                        <div class="total-display">
-                            <small style="font-size:0.9rem; display:block;">Total</small>
-                            R$ <span id="lbl-total">0.00</span>
-                        </div>
-
-                        <button id="btn-finalizar" class="btn-primary" style="width: 100%; padding: 12px;">Finalizar Venda</button>
-                    </div>
                 </div>
             </div>
         </div>
     </div>
+
+    <!-- Modal de Finalização / Pagamento -->
+    <div class="modal-overlay" id="modal-pagamento">
+        <div class="modal-card">
+            <h3 style="color: #3E2723; margin-bottom: 20px;">Finalizar Venda</h3>
+            <div style="margin-bottom: 15px;">
+                <label style="font-weight: bold;">Forma de Pagamento:</label>
+                <select id="select-forma-pagamento" class="form-control" style="margin-top: 5px;" onchange="atualizarCampoTroco()">
+                    <option value="Dinheiro">Dinheiro</option>
+                    <option value="PIX">PIX</option>
+                    <option value="Crédito">Cartão de Crédito</option>
+                    <option value="Débito">Cartão de Débito</option>
+                </select>
+            </div>
+
+            <div id="box-troco" style="margin-bottom: 15px;">
+                <label style="font-weight: bold;">Valor Recebido (R$):</label>
+                <input type="number" step="0.01" id="inp-valor-recebido" class="form-control" placeholder="0.00" oninput="calcularTroco()">
+                <div style="margin-top: 8px; font-weight: bold; color: #2E7D32;" id="lbl-troco">Troco: R$ 0,00</div>
+            </div>
+
+            <div style="display: flex; gap: 10px; margin-top: 25px;">
+                <button class="btn-primary" style="flex: 1; background-color: #757575;" onclick="fecharModalPagamento()">Cancelar</button>
+                <button class="btn-primary" style="flex: 1;" onclick="confirmarVenda()">Confirmar</button>
+            </div>
+        </div>
+    </div>
+
     <script src="api.js"></script>
     <script src="sidebar.js"></script>
     <script src="vendas.js"></script>
