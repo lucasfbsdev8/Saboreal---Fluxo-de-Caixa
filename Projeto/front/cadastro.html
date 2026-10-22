@@ -2,143 +2,174 @@
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
-    <title>Cadastro de Produtos - SABOREAL</title>
+    <title>Cadastro - SABOREAL</title>
     <link rel="stylesheet" href="style.css">
+    <style>
+        .btn-table-action {
+            border: none;
+            padding: 5px 10px;
+            border-radius: 4px;
+            font-weight: bold;
+            cursor: pointer;
+            margin-right: 5px;
+        }
+        .btn-edit {
+            background-color: #8D6E63;
+            color: white;
+        }
+        .btn-delete {
+            background-color: #C02E28;
+            color: white;
+        }
+        .modal-overlay {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0, 0, 0, 0.6);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+        .modal-delete-card {
+            background: #FFF;
+            padding: 30px;
+            border-radius: 12px;
+            width: 420px;
+            max-width: 90%;
+            border-top: 6px solid #C02E28;
+            box-shadow: 0 5px 20px rgba(192, 46, 40, 0.3);
+            text-align: center;
+        }
+        .modal-delete-icon {
+            font-size: 3rem;
+            color: #C02E28;
+            margin-bottom: 10px;
+        }
+        .modal-delete-title {
+            color: #C02E28;
+            font-size: 1.4rem;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+        .modal-delete-text {
+            color: #3E2723;
+            font-size: 1rem;
+            line-height: 1.4;
+            margin-bottom: 20px;
+        }
+        .btn-modal-cancel {
+            background-color: #757575;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 6px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+        .btn-modal-confirm-delete {
+            background-color: #C02E28;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 6px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+    </style>
 </head>
 <body>
     <div class="app-container">
         <div id="sidebar-container"></div>
         <div class="main-content">
             <div class="top-bar">
-                <h2>Cadastro de produtos</h2>
+                <h2>Cadastro de Produtos</h2>
                 <div class="user-info">👤 Gerência</div>
             </div>
+            
             <div class="page-body">
-                <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 20px;">
-                    <div>
-                        <table class="table-custom">
-                            <thead>
-                                <tr>
-                                    <th>Cód.</th>
-                                    <th>Produto</th>
-                                    <th>Categoria</th>
-                                    <th>Preço</th>
-                                    <th>Ações</th>
-                                </tr>
-                            </thead>
-                            <tbody id="tb-produtos"></tbody>
-                        </table>
-                    </div>
-
+                <div style="display: grid; grid-template-columns: 1fr 2fr; gap: 20px;">
+                    
+                    <!-- Formulário de Cadastro e Edição -->
                     <div class="card-panel">
-                        <h3 id="form-titulo">Novo produto</h3>
-                        <form id="form-produto" style="margin-top: 10px;">
+                        <h3 id="form-title" style="color: #3E2723; margin-bottom: 15px;">Novo Produto</h3>
+                        <form id="form-produto">
+                            <input type="hidden" id="prod-modo" value="CADASTRO">
+                            
                             <div class="form-group">
-                                <label>Código (Automático)</label>
-                                <input type="text" id="p-cod" class="form-control" readonly style="background-color: #E0E0E0; font-weight: bold;">
+                                <label>Código Automático</label>
+                                <input type="text" id="prod-codigo" class="form-control" readonly style="background-color: #E0E0E0; font-weight: bold;">
                             </div>
-                            <div class="form-group"><label>Nome</label><input type="text" id="p-nome" class="form-control" required></div>
-                            <div class="form-group"><label>Categoria</label><input type="text" id="p-cat" class="form-control" required></div>
-                            <div class="form-group"><label>Preço de venda (R\$)</label><input type="number" step="0.01" id="p-preco" class="form-control" required></div>
-                            <div class="form-group" id="box-estoque-inicial">
-                                <label>Estoque Inicial</label>
-                                <input type="number" id="p-estoque" class="form-control" value="0">
+                            
+                            <div class="form-group">
+                                <label>Nome do Produto</label>
+                                <input type="text" id="prod-nome" class="form-control" placeholder="Ex: Biscoito Amanteigado 200g" required>
                             </div>
-                            <button type="submit" class="btn-primary" id="btn-salvar-prod" style="width: 100%;">Salvar produto</button>
-                            <button type="button" class="btn-primary" id="btn-cancelar-edit" style="width: 100%; margin-top: 8px; background-color: #757575; display: none;" onclick="resetarFormulario()">Cancelar Edição</button>
+                            
+                            <div class="form-group">
+                                <label>Categoria (Digitação Livre)</label>
+                                <input type="text" id="prod-categoria" class="form-control" list="lista-categorias-sugeridas" placeholder="Digite ou escolha uma categoria">
+                                <datalist id="lista-categorias-sugeridas">
+                                    <option value="Doces"></option>
+                                    <option value="Salgados"></option>
+                                    <option value="Especiais"></option>
+                                </datalist>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label>Preço de Venda (R$)</label>
+                                <input type="number" step="0.01" id="prod-preco" class="form-control" placeholder="0.00" required>
+                            </div>
+                            
+                            <div style="display: flex; gap: 10px; margin-top: 15px;">
+                                <button type="button" id="btn-cancelar-edicao" class="btn-primary" style="background-color: #757575; display: none;" onclick="resetarFormulario()">Cancelar</button>
+                                <button type="submit" id="btn-salvar-prod" class="btn-primary" style="flex: 1;">Cadastrar Produto</button>
+                            </div>
                         </form>
                     </div>
+
+                    <!-- Tabela de Produtos Cadastrados -->
+                    <div class="card-panel">
+                        <h3 style="color: #3E2723; margin-bottom: 15px;">Produtos Cadastrados</h3>
+                        <div style="overflow-x: auto;">
+                            <table class="table-custom">
+                                <thead>
+                                    <tr>
+                                        <th>Cód.</th>
+                                        <th>Nome</th>
+                                        <th>Categoria</th>
+                                        <th>Preço</th>
+                                        <th>Estoque</th>
+                                        <th>Ações</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="tb-produtos-body">
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
                 </div>
             </div>
         </div>
     </div>
+
+    <!-- Modal Vermelho de Confirmação de Exclusão -->
+    <div class="modal-overlay" id="modal-confirmar-exclusao">
+        <div class="modal-delete-card">
+            <div class="modal-delete-icon">⚠️</div>
+            <div class="modal-delete-title">CONFIRMAR EXCLUSÃO</div>
+            <div class="modal-delete-text" id="lbl-msg-exclusao">
+                Tem certeza que deseja excluir este produto? Esta ação não poderá ser desfeita.
+            </div>
+            <div style="display: flex; gap: 10px; justify-content: center;">
+                <button class="btn-modal-cancel" onclick="fecharModalExclusao()">Cancelar</button>
+                <button class="btn-modal-confirm-delete" onclick="confirmarExclusaoModal()">Sim, Excluir Produto</button>
+            </div>
+        </div>
+    </div>
+
     <script src="api.js"></script>
     <script src="sidebar.js"></script>
-    <script>
-        let produtosCache = [];
-        let modoEdicao = false;
-
-        async function carregarProdutos() {
-            const res = await apiRequest('/produtos') || { produtos: [], proximo_codigo: '01' };
-            produtosCache = res.produtos;
-            
-            const tbody = document.getElementById('tb-produtos');
-            tbody.innerHTML = '';
-            produtosCache.forEach(p => {
-                tbody.innerHTML += `
-                    <tr>
-                        <td><strong>${p.codigo}</strong></td>
-                        <td>${p.nome}</td>
-                        <td>${p.categoria}</td>
-                        <td>R$ ${p.preco_venda.toFixed(2)}</td>
-                        <td>
-                            <button class="btn-primary" style="padding: 4px 10px; font-size: 0.8rem; background-color: #8D6E63;" onclick="prepararEdicao('${p.codigo}')">✏️ Editar</button>
-                        </td>
-                    </tr>
-                `;
-            });
-
-            if (!modoEdicao) {
-                document.getElementById('p-cod').value = res.proximo_codigo;
-            }
-        }
-
-        function prepararEdicao(codigo) {
-            const prod = produtosCache.find(p => p.codigo === codigo);
-            if (!prod) return;
-
-            modoEdicao = true;
-            document.getElementById('form-titulo').textContent = `Editar Produto (${prod.codigo})`;
-            document.getElementById('p-cod').value = prod.codigo;
-            document.getElementById('p-nome').value = prod.nome;
-            document.getElementById('p-cat').value = prod.categoria;
-            document.getElementById('p-preco').value = prod.preco_venda;
-            
-            document.getElementById('box-estoque-inicial').style.display = 'none';
-            document.getElementById('btn-salvar-prod').textContent = 'Atualizar produto';
-            document.getElementById('btn-cancelar-edit').style.display = 'block';
-        }
-
-        function resetarFormulario() {
-            modoEdicao = false;
-            document.getElementById('form-titulo').textContent = 'Novo produto';
-            document.getElementById('form-produto').reset();
-            document.getElementById('box-estoque-inicial').style.display = 'block';
-            document.getElementById('btn-salvar-prod').textContent = 'Salvar produto';
-            document.getElementById('btn-cancelar-edit').style.display = 'none';
-            carregarProdutos();
-        }
-
-        document.getElementById('form-produto').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            
-            if (modoEdicao) {
-                const res = await apiRequest('/produtos', 'PUT', {
-                    codigo: document.getElementById('p-cod').value,
-                    nome: document.getElementById('p-nome').value,
-                    categoria: document.getElementById('p-cat').value,
-                    preco_venda: parseFloat(document.getElementById('p-preco').value)
-                });
-                if (res && res.sucesso) {
-                    alert('Produto atualizado com sucesso!');
-                    resetarFormulario();
-                }
-            } else {
-                const res = await apiRequest('/produtos', 'POST', {
-                    codigo: document.getElementById('p-cod').value,
-                    nome: document.getElementById('p-nome').value,
-                    categoria: document.getElementById('p-cat').value,
-                    preco_venda: parseFloat(document.getElementById('p-preco').value),
-                    estoque: parseInt(document.getElementById('p-estoque').value) || 0
-                });
-                if (res && res.sucesso) {
-                    alert('Produto cadastrado com sucesso!');
-                    resetarFormulario();
-                }
-            }
-        });
-
-        document.addEventListener('DOMContentLoaded', carregarProdutos);
-    </script>
+    <script src="cadastro.js"></script>
 </body>
 </html>

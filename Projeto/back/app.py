@@ -81,6 +81,23 @@ def produtos():
             db.close()
             return jsonify({'sucesso': False, 'erro': str(e)}), 400
 
+@app.route('/api/produtos/<codigo>', methods=['DELETE'])
+def excluir_produto(codigo):
+    db = get_db()
+    try:
+        prod = db.execute('SELECT * FROM produtos WHERE codigo = ?', (codigo,)).fetchone()
+        if not prod:
+            db.close()
+            return jsonify({'sucesso': False, 'erro': 'Produto não encontrado.'}), 404
+
+        db.execute('DELETE FROM produtos WHERE codigo = ?', (codigo,))
+        db.commit()
+        db.close()
+        return jsonify({'sucesso': True, 'mensagem': f'Produto {codigo} excluído com sucesso!'})
+    except Exception as e:
+        db.close()
+        return jsonify({'sucesso': False, 'erro': str(e)}), 400
+
 @app.route('/api/produtos/estoque', methods=['POST'])
 def ajustar_estoque():
     data = request.json
@@ -113,14 +130,21 @@ def caixa_status():
         caixa_id = caixa_aberto['id']
         valor_abertura = caixa_aberto['valor_abertura'] or 0.0
 
-        # Soma vendas em dinheiro deste caixa
+        # Vendas em Dinheiro
         vendas_dinheiro = db.execute('''
             SELECT SUM(total) as total 
             FROM vendas 
             WHERE caixa_id = ? AND forma_pagamento = "Dinheiro"
         ''', (caixa_id,)).fetchone()['total'] or 0.0
 
-        # Subtrai saídas registradas em dinheiro a partir da abertura deste caixa
+        # Vendas em Banco (PIX, Crédito, Débito)
+        vendas_banco = db.execute('''
+            SELECT SUM(total) as total 
+            FROM vendas 
+            WHERE caixa_id = ? AND forma_pagamento IN ("PIX", "Crédito", "Débito")
+        ''', (caixa_id,)).fetchone()['total'] or 0.0
+
+        # Saídas em Dinheiro
         data_abertura = caixa_aberto['data_abertura']
         saidas_dinheiro = db.execute('''
             SELECT SUM(valor) as total 
@@ -128,13 +152,19 @@ def caixa_status():
             WHERE tipo = "SAIDA" AND forma_pagamento = "Dinheiro" AND data_movimentacao >= ?
         ''', (data_abertura,)).fetchone()['total'] or 0.0
 
-        valor_calculado = valor_abertura + vendas_dinheiro - saidas_dinheiro
+        saldo_dinheiro = valor_abertura + vendas_dinheiro - saidas_dinheiro
+        saldo_banco = vendas_banco
+        valor_atual_total = saldo_dinheiro + saldo_banco
 
         db.close()
         return jsonify({
             'aberto': True, 
             'dados': dict(caixa_aberto),
-            'valor_calculado_fechamento': valor_calculado,
+            'valor_abertura': valor_abertura,
+            'valor_atual_total': valor_atual_total,
+            'saldo_dinheiro': saldo_dinheiro,
+            'saldo_banco': saldo_banco,
+            'valor_calculado_fechamento': saldo_dinheiro,
             'detalhes_fechamento': {
                 'valor_abertura': valor_abertura,
                 'vendas_dinheiro': vendas_dinheiro,
@@ -156,8 +186,9 @@ def caixa_status():
 def abrir_caixa():
     data = request.json
     db = get_db()
+    valor_abertura_total = float(data.get('valor_abertura', 0.0))
     db.execute('INSERT INTO caixa (operador, valor_abertura, observacao) VALUES (?, ?, ?)',
-               (data.get('operador', 'Gerência'), data.get('valor_abertura', 0.0), data.get('observacao', '')))
+               (data.get('operador', 'Gerência'), valor_abertura_total, data.get('observacao', '')))
     db.commit()
     db.close()
     return jsonify({'sucesso': True, 'mensagem': 'Caixa aberto com sucesso!'})

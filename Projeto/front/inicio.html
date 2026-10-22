@@ -5,55 +5,138 @@
     <title>Início - SABOREAL</title>
     <link rel="stylesheet" href="style.css">
     <style>
-        .status-box {
+        .header-logo-title {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .header-logo-title img {
+            width: 42px;
+            height: 42px;
+            object-fit: contain;
+        }
+
+        .status-summary-card {
             background-color: #B5A992;
             border-radius: 12px;
-            padding: 30px;
-            text-align: center;
-            max-width: 520px;
-            margin: 30px auto;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            padding: 20px 25px;
+            margin-bottom: 25px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.08);
+            color: #3E2723;
         }
 
-        .status-badge-large {
-            display: inline-block;
-            padding: 10px 25px;
-            border-radius: 25px;
-            font-size: 1.4rem;
+        .status-summary-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 2px solid #8D6E63;
+            padding-bottom: 12px;
+            margin-bottom: 15px;
+        }
+
+        .badge-status {
+            padding: 6px 18px;
+            border-radius: 20px;
             font-weight: bold;
-            color: white;
-            margin-bottom: 20px;
-        }
-
-        .bg-fechado { background-color: #C02E28; }
-        .bg-aberto { background-color: #2E7D32; }
-
-        .action-buttons {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 12px;
-            margin-top: 25px;
-        }
-
-        .action-buttons.single-col {
-            grid-template-columns: 1fr;
-        }
-
-        .btn-action {
-            padding: 14px;
             font-size: 1rem;
-            border-radius: 8px;
-            border: none;
-            font-weight: bold;
-            cursor: pointer;
-            text-decoration: none;
             color: white;
-            text-align: center;
-            transition: opacity 0.2s;
         }
 
-        .btn-action:hover {
-            opacity: 0.9;
+        .bg-aberto { background-color: #2E7D32; }
+        .bg-fechado { background-color: #C02E28; }
+
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+        }
+
+        .metric-box {
+            background-color: #FFF;
+            border-radius: 8px;
+            padding: 12px 15px;
+            border-left: 4px solid #8D6E63;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        }
+
+        .metric-box label {
+            font-size: 0.82rem;
+            color: #6D4C41;
+            font-weight: bold;
+            display: block;
+            margin-bottom: 4px;
+        }
+
+        .metric-box span {
+            font-size: 1.15rem;
+            font-weight: bold;
+            color: #2C1D1A;
+        }
+
+        .actions-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 18px;
+        }
+
+        @media (max-width: 768px) {
+            .actions-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .btn-action-card {
+            background-color: #8D6E63;
+            color: white;
+            border-radius: 10px;
+            padding: 22px 15px;
+            text-align: center;
+            text-decoration: none;
+            font-weight: bold;
+            font-size: 1.1rem;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            transition: transform 0.15s, background-color 0.15s;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            cursor: pointer;
+            border: none;
+        }
+
+        .btn-action-card:hover {
+            transform: translateY(-3px);
+            background-color: #6D4C41;
+        }
+
+        .btn-action-card.btn-fechar {
+            background-color: #C02E28;
+        }
+
+        .btn-action-card.btn-fechar:hover {
+            background-color: #9A241F;
+        }
+
+        .btn-action-card.btn-abrir {
+            background-color: #2E7D32;
+        }
+
+        .btn-action-card.btn-abrir:hover {
+            background-color: #1B5E20;
+        }
+
+        .btn-action-card.btn-sair {
+            background-color: #5D4037;
+        }
+
+        .btn-action-card.btn-sair:hover {
+            background-color: #3E2723;
+        }
+
+        .btn-icon {
+            font-size: 1.8rem;
         }
     </style>
 </head>
@@ -61,24 +144,32 @@
     <div class="app-container">
         <div id="sidebar-container"></div>
         <div class="main-content">
+            
             <div class="top-bar">
-                <h2>Início</h2>
+                <div class="header-logo-title">
+                    <img src="imagens/logo.png" alt="SABOREAL">
+                    <h2>Início</h2>
+                </div>
                 <div class="user-info">👤 Gerência</div>
             </div>
+
             <div class="page-body">
                 
-                <div class="status-box">
-                    <div id="badge-caixa" class="status-badge-large bg-fechado">
-                        CAIXA FECHADO
+                <!-- Card do Status do Caixa -->
+                <div class="status-summary-card">
+                    <div class="status-summary-header">
+                        <h3 style="margin: 0;">Status do Caixa</h3>
+                        <span id="lbl-status-badge" class="badge-status bg-fechado">CAIXA FECHADO</span>
                     </div>
 
-                    <p id="info-caixa" style="color: #3E2723; font-size: 1.05rem; line-height: 1.5;">
-                        O caixa está fechado no momento. Abra o caixa para realizar vendas e movimentações.
-                    </p>
-
-                    <div class="action-buttons" id="box-botoes">
+                    <div class="metrics-grid" id="container-metricas">
                         <!-- Renderizado via JS -->
                     </div>
+                </div>
+
+                <!-- Grid de Botões (Baseado no Esboço) -->
+                <div class="actions-grid" id="container-botoes-acao">
+                    <!-- Renderizado via JS conforme status -->
                 </div>
 
             </div>
@@ -90,34 +181,102 @@
     <script>
         document.addEventListener('DOMContentLoaded', async () => {
             const status = await apiRequest('/caixa/status') || { aberto: false };
-            const badge = document.getElementById('badge-caixa');
-            const info = document.getElementById('info-caixa');
-            const box = document.getElementById('box-botoes');
+            const badge = document.getElementById('lbl-status-badge');
+            const gridMetricas = document.getElementById('container-metricas');
+            const gridBotoes = document.getElementById('container-botoes-acao');
 
             if (status.aberto) {
                 badge.textContent = "CAIXA ABERTO";
-                badge.className = "status-badge-large bg-aberto";
-                info.innerHTML = `<strong>Operador:</strong> ${status.dados.operador}<br><strong>Valor Abertura:</strong> R$ ${status.dados.valor_abertura.toFixed(2)}`;
-                
-                box.className = "action-buttons"; // Grid de 2 colunas
-                box.innerHTML = `
-                    <a href="vendas.html" class="btn-action" style="background-color: #2E7D32;">🛒 Nova Venda</a>
-                    <a href="estoque.html" class="btn-action" style="background-color: #8D6E63;">📦 Adicionar Estoque</a>
-                    <a href="relatorios.html" class="btn-action" style="background-color: #3E2723;">📊 Ver Relatórios</a>
-                    <a href="caixa.html?aba=fechar" class="btn-action" style="background-color: #C02E28;">🔒 Fechar Caixa</a>
+                badge.className = "badge-status bg-aberto";
+
+                const valAbertura = (status.valor_abertura || 0).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+                const valAtual = (status.valor_atual_total || 0).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+                const saldoDinheiro = (status.saldo_dinheiro || 0).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+                const saldoBanco = (status.saldo_banco || 0).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+
+                gridMetricas.innerHTML = `
+                    <div class="metric-box">
+                        <label>VALOR AO ABRIR</label>
+                        <span>${valAbertura}</span>
+                    </div>
+                    <div class="metric-box">
+                        <label>VALOR ATUAL TOTAL</label>
+                        <span>${valAtual}</span>
+                    </div>
+                    <div class="metric-box">
+                        <label>SALDO ATUAL (DINHEIRO)</label>
+                        <span style="color: #2E7D32;">${saldoDinheiro}</span>
+                    </div>
+                    <div class="metric-box">
+                        <label>SALDO ATUAL (BANCO)</label>
+                        <span style="color: #1565C0;">${saldoBanco}</span>
+                    </div>
+                `;
+
+                // 6 Botões de Ação do Esboço quando Aberto
+                gridBotoes.innerHTML = `
+                    <a href="vendas.html" class="btn-action-card">
+                        <span class="btn-icon">🛒</span>
+                        <span>Nova Venda</span>
+                    </a>
+                    <a href="caixa.html?aba=saida" class="btn-action-card">
+                        <span class="btn-icon">💸</span>
+                        <span>Nova Saída</span>
+                    </a>
+                    <a href="cadastro.html" class="btn-action-card">
+                        <span class="btn-icon">📝</span>
+                        <span>Cadastro de Produtos</span>
+                    </a>
+                    <a href="estoque.html" class="btn-action-card">
+                        <span class="btn-icon">📦</span>
+                        <span>Adicionar Estoque</span>
+                    </a>
+                    <a href="relatorios.html" class="btn-action-card">
+                        <span class="btn-icon">📊</span>
+                        <span>Relatórios</span>
+                    </a>
+                    <a href="caixa.html?aba=fechar" class="btn-action-card btn-fechar">
+                        <span class="btn-icon">🔒</span>
+                        <span>Fechar Caixa</span>
+                    </a>
                 `;
             } else {
                 badge.textContent = "CAIXA FECHADO";
-                badge.className = "status-badge-large bg-fechado";
-                info.textContent = "O caixa está fechado no momento. Abra o caixa para liberar vendas e movimentações.";
-                
-                box.className = "action-buttons single-col"; // 1 coluna
-                box.innerHTML = `
-                    <a href="caixa.html?aba=abrir" class="btn-action" style="background-color: #2E7D32;">🔑 Abrir Caixa</a>
-                    <a href="relatorios.html" class="btn-action" style="background-color: #8D6E63;">📊 Ver Relatórios</a>
+                badge.className = "badge-status bg-fechado";
+
+                const saldoAnterior = (status.ultimo_valor_fechamento || 0).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+
+                gridMetricas.innerHTML = `
+                    <div class="metric-box" style="grid-column: 1 / -1;">
+                        <label>ÚLTIMO FECHAMENTO REGISTRADO</label>
+                        <span>${saldoAnterior}</span>
+                    </div>
+                `;
+
+                // Botões visíveis com Caixa Fechado (incluindo Sair)
+                gridBotoes.innerHTML = `
+                    <a href="caixa.html?aba=abrir" class="btn-action-card btn-abrir">
+                        <span class="btn-icon">🔑</span>
+                        <span>Abrir Caixa</span>
+                    </a>
+                    <a href="relatorios.html" class="btn-action-card">
+                        <span class="btn-icon">📊</span>
+                        <span>Relatórios</span>
+                    </a>
+                    <button onclick="fazerLogout()" class="btn-action-card btn-sair">
+                        <span class="btn-icon">🚪</span>
+                        <span>Sair</span>
+                    </button>
                 `;
             }
         });
+
+        function fazerLogout() {
+            if (confirm('Deseja realmente sair do sistema?')) {
+                localStorage.removeItem('usuarioLogado');
+                window.location.href = 'index.html';
+            }
+        }
     </script>
 </body>
 </html>

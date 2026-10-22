@@ -59,15 +59,21 @@
                         <div class="resumo-box">
                             <div>
                                 <span>Saldo do último fechamento:</span>
-                                <strong id="lbl-saldo-anterior">R\$ 0,00</strong>
+                                <strong id="lbl-saldo-anterior">R$ 0,00</strong>
                             </div>
                             <div class="form-group" style="margin-top: 10px; margin-bottom: 0;">
-                                <label style="font-size: 0.85rem;">+ Aporte / Troco reforçado (R\$):</label>
-                                <input type="number" step="0.01" id="abrir-reforco" class="form-control" value="0.00" oninput="calcularTotalAbertura()">
+                                <label style="font-size: 0.85rem;">+ Aporte / Troco reforçado (R$):</label>
+                                <input type="text" 
+                                       id="abrir-reforco" 
+                                       class="form-control" 
+                                       value="R$ 0,00" 
+                                       onclick="this.select()" 
+                                       onfocus="this.select()" 
+                                       oninput="formatarMoedaMaquininha(this); calcularTotalAbertura();">
                             </div>
                             <div class="total-linha">
                                 <span>Total Inicial em Caixa:</span>
-                                <span id="lbl-total-abertura">R\$ 0,00</span>
+                                <span id="lbl-total-abertura">R$ 0,00</span>
                             </div>
                         </div>
 
@@ -88,25 +94,32 @@
                         <div class="resumo-box">
                             <div>
                                 <span>(+) Valor de Abertura:</span>
-                                <span id="lbl-fechar-abertura">R\$ 0,00</span>
+                                <span id="lbl-fechar-abertura">R$ 0,00</span>
                             </div>
                             <div>
                                 <span>(+) Vendas em Dinheiro:</span>
-                                <span id="lbl-fechar-vendas" style="color: #2E7D32;">+ R\$ 0,00</span>
+                                <span id="lbl-fechar-vendas" style="color: #2E7D32;">+ R$ 0,00</span>
                             </div>
                             <div>
                                 <span>(-) Saídas em Dinheiro:</span>
-                                <span id="lbl-fechar-saidas" style="color: #C62828;">- R\$ 0,00</span>
+                                <span id="lbl-fechar-saidas" style="color: #C62828;">- R$ 0,00</span>
                             </div>
                             <div class="total-linha">
                                 <span>Total Esperado na Gaveta:</span>
-                                <span id="lbl-fechar-esperado">R\$ 0,00</span>
+                                <span id="lbl-fechar-esperado">R$ 0,00</span>
                             </div>
                         </div>
 
                         <div class="form-group">
-                            <label>Valor total contado no caixa (R\$)</label>
-                            <input type="number" step="0.01" id="fechar-valor" class="form-control" placeholder="0.00" required oninput="validarDivergenciaFechamento()">
+                            <label>Valor total contado no caixa (R$)</label>
+                            <input type="text" 
+                                   id="fechar-valor" 
+                                   class="form-control" 
+                                   placeholder="R$ 0,00" 
+                                   required 
+                                   onclick="this.select()" 
+                                   onfocus="this.select()" 
+                                   oninput="formatarMoedaMaquininha(this); validarDivergenciaFechamento();">
                             <div id="lbl-divergencia" class="divergencia-badge"></div>
                         </div>
                         <div class="form-group">
@@ -134,8 +147,15 @@
                             <input type="text" id="saida-descricao" class="form-control" placeholder="Ex: Compra de farinha">
                         </div>
                         <div class="form-group">
-                            <label>Valor (R\$)</label>
-                            <input type="number" step="0.01" id="saida-valor" class="form-control" placeholder="R\$ 0,00" required>
+                            <label>Valor (R$)</label>
+                            <input type="text" 
+                                   id="saida-valor" 
+                                   class="form-control" 
+                                   placeholder="R$ 0,00" 
+                                   required 
+                                   onclick="this.select()" 
+                                   onfocus="this.select()" 
+                                   oninput="formatarMoedaMaquininha(this)">
                         </div>
                         <div class="form-group">
                             <label>Forma de pagamento</label>
@@ -175,82 +195,5 @@
     <script src="api.js"></script>
     <script src="sidebar.js"></script>
     <script src="caixa.js"></script>
-    <script>
-        let saldoAnteriorBase = 0.0;
-        let valorCalculadoFechamentoBase = 0.0;
-
-        document.addEventListener('DOMContentLoaded', async () => {
-            const params = new URLSearchParams(window.location.search);
-            const aba = params.get('aba') || 'abrir';
-
-            const status = await apiRequest('/caixa/status') || {};
-
-            if (aba === 'abrir') {
-                saldoAnteriorBase = status.ultimo_valor_fechamento || 0.0;
-                document.getElementById('lbl-saldo-anterior').textContent = `R$ ${saldoAnteriorBase.toFixed(2)}`;
-                calcularTotalAbertura();
-            } else if (aba === 'fechar' && status.aberto) {
-                const det = status.detalhes_fechamento || {};
-                valorCalculadoFechamentoBase = status.valor_calculado_fechamento || 0.0;
-
-                document.getElementById('lbl-fechar-abertura').textContent = `R$ ${(det.valor_abertura || 0).toFixed(2)}`;
-                document.getElementById('lbl-fechar-vendas').textContent = `+ R$ ${(det.vendas_dinheiro || 0).toFixed(2)}`;
-                document.getElementById('lbl-fechar-saidas').textContent = `- R$ ${(det.saidas_dinheiro || 0).toFixed(2)}`;
-                document.getElementById('lbl-fechar-esperado').textContent = `R$ ${valorCalculadoFechamentoBase.toFixed(2)}`;
-                
-                document.getElementById('fechar-valor').value = valorCalculadoFechamentoBase.toFixed(2);
-                validarDivergenciaFechamento();
-            }
-        });
-
-        function calcularTotalAbertura() {
-            const reforco = parseFloat(document.getElementById('abrir-reforco').value) || 0.0;
-            const total = saldoAnteriorBase + reforco;
-            document.getElementById('lbl-total-abertura').textContent = `R$ ${total.toFixed(2)}`;
-        }
-
-        function validarDivergenciaFechamento() {
-            const informado = parseFloat(document.getElementById('fechar-valor').value) || 0.0;
-            const diff = informado - valorCalculadoFechamentoBase;
-            const badge = document.getElementById('lbl-divergencia');
-
-            if (isNaN(informado)) {
-                badge.style.display = 'none';
-                return;
-            }
-
-            badge.style.display = 'block';
-            if (Math.abs(diff) < 0.01) {
-                badge.textContent = '✅ Caixa sem divergência';
-                badge.style.backgroundColor = '#E8F5E9';
-                badge.style.color = '#2E7D32';
-            } else if (diff < 0) {
-                badge.textContent = `⚠️ Quebra de Caixa (Falta): R$ ${Math.abs(diff).toFixed(2)}`;
-                badge.style.backgroundColor = '#FFEBEE';
-                badge.style.color = '#C62828';
-            } else {
-                badge.textContent = `ℹ️ Sobra de Caixa: R$ ${diff.toFixed(2)}`;
-                badge.style.backgroundColor = '#E3F2FD';
-                badge.style.color = '#1565C0';
-            }
-        }
-
-        document.getElementById('form-abrir')?.addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const reforco = parseFloat(document.getElementById('abrir-reforco').value) || 0.0;
-            const valorTotalAbertura = saldoAnteriorBase + reforco;
-
-            const res = await apiRequest('/caixa/abrir', 'POST', {
-                operador: document.getElementById('abrir-operador').value,
-                valor_abertura: valorTotalAbertura,
-                observacao: document.getElementById('abrir-obs').value
-            });
-
-            if (res && res.sucesso) {
-                alert('✅ Caixa aberto com sucesso!');
-                window.location.href = 'inicio.html';
-            }
-        });
-    </script>
 </body>
 </html>

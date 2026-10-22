@@ -8,7 +8,6 @@ document.addEventListener('DOMContentLoaded', () => {
 async function carregarProdutosPDV() {
     const res = await apiRequest('/produtos');
     
-    // Tratamento para ler tanto o formato objeto { produtos: [...] } quanto lista simples [...]
     if (res && res.produtos && Array.isArray(res.produtos)) {
         produtosCache = res.produtos;
     } else if (Array.isArray(res)) {
@@ -116,7 +115,7 @@ function atualizarCarrinhoUI() {
     if (carrinho.length === 0) {
         lista.innerHTML = '<p style="text-align: center; color: #5D4037; margin-top: 20px;">Carrinho vazio</p>';
         document.getElementById('lbl-total-itens').textContent = '0';
-        document.getElementById('lbl-total-valor').textContent = 'R\$ 0,00';
+        document.getElementById('lbl-total-valor').textContent = 'R$ 0,00';
         return;
     }
 
@@ -170,6 +169,17 @@ function atualizarCampoTroco() {
     const boxTroco = document.getElementById('box-troco');
     if (forma === 'Dinheiro') {
         boxTroco.style.display = 'block';
+        
+        // Preenche automaticamente o campo com o valor total exato da venda
+        const totalValor = carrinho.reduce((acc, i) => acc + (i.preco * i.quantidade), 0);
+        const inpRecebido = document.getElementById('inp-valor-recebido');
+        if (inpRecebido) {
+            inpRecebido.value = totalValor.toFixed(2);
+            // Seleciona o texto ao focar para facilitar caso queiram alterar a quantia
+            inpRecebido.onclick = function() { this.select(); };
+            inpRecebido.onfocus = function() { this.select(); };
+        }
+        calcularTroco();
     } else {
         boxTroco.style.display = 'none';
     }
@@ -212,9 +222,17 @@ async function confirmarVenda() {
 
     if (res && res.sucesso) {
         alert('✅ Venda realizada com sucesso!');
+        fecharModalPagamento();
         carrinho = [];
         atualizarCarrinhoUI();
-        fecharModalPagamento();
-        carregarProdutosPDV();
+
+        setTimeout(() => {
+            const desejaOutra = confirm('Deseja realizar outra venda?');
+            if (desejaOutra) {
+                carregarProdutosPDV();
+            } else {
+                window.location.href = 'inicio.html';
+            }
+        }, 50);
     }
 }
