@@ -40,6 +40,17 @@ html, body {
     flex-shrink: 0; /* Impede que a sidebar seja espremida */
 }
 
+.icone {
+  width: 22px;
+  height: 22px;
+  flex-shrink: 0;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
 .brand {
     text-align: center;
     padding: 0 15px 20px 15px;
