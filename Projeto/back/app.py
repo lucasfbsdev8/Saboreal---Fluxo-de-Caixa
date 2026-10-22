@@ -71,9 +71,9 @@ def produtos():
         data = request.json
         try:
             db.execute('''UPDATE produtos 
-                          SET nome = ?, categoria = ?, preco_venda = ? 
+                          SET nome = ?, categoria = ?, preco_venda = ?, custo = ?
                           WHERE codigo = ?''',
-                       (data['nome'], data['categoria'], data['preco_venda'], data['codigo']))
+                       (data['nome'], data['categoria'], data['preco_venda'], data.get('custo', 0.0), data['codigo']))
             db.commit()
             db.close()
             return jsonify({'sucesso': True, 'mensagem': 'Produto atualizado!'})
@@ -130,21 +130,18 @@ def caixa_status():
         caixa_id = caixa_aberto['id']
         valor_abertura = caixa_aberto['valor_abertura'] or 0.0
 
-        # Vendas em Dinheiro
         vendas_dinheiro = db.execute('''
             SELECT SUM(total) as total 
             FROM vendas 
             WHERE caixa_id = ? AND forma_pagamento = "Dinheiro"
         ''', (caixa_id,)).fetchone()['total'] or 0.0
 
-        # Vendas em Banco (PIX, Crédito, Débito)
         vendas_banco = db.execute('''
             SELECT SUM(total) as total 
             FROM vendas 
             WHERE caixa_id = ? AND forma_pagamento IN ("PIX", "Crédito", "Débito")
         ''', (caixa_id,)).fetchone()['total'] or 0.0
 
-        # Saídas em Dinheiro
         data_abertura = caixa_aberto['data_abertura']
         saidas_dinheiro = db.execute('''
             SELECT SUM(valor) as total 
@@ -229,13 +226,6 @@ def movimentacoes():
         db.close()
         return jsonify([dict(m) for m in movs])
 
-@app.route('/api/caixa/fluxo', methods=['GET'])
-def obter_fluxo_caixa():
-    db = get_db()
-    fluxos = db.execute('SELECT * FROM fluxo_caixa_mensal ORDER BY id ASC').fetchall()
-    db.close()
-    return jsonify([dict(f) for f in fluxos])
-
 @app.route('/api/vendas', methods=['POST'])
 def realizar_venda():
     data = request.json
@@ -247,7 +237,7 @@ def realizar_venda():
             return jsonify({'sucesso': False, 'erro': 'Não é possível realizar vendas com o caixa fechado!'}), 400
 
         for item in data['itens']:
-            prod = db.execute('SELECT estoque, nome FROM produtos WHERE codigo = ?', (item['codigo'],)).fetchone()
+            prod = db.execute('SELECT estoque, nome, custo FROM produtos WHERE codigo = ?', (item['codigo'],)).fetchone()
             if not prod:
                 db.close()
                 return jsonify({'sucesso': False, 'erro': f"Produto {item['codigo']} não encontrado."}), 400
@@ -264,8 +254,11 @@ def realizar_venda():
         venda_id = cursor.lastrowid
 
         for item in data['itens']:
-            cursor.execute('INSERT INTO itens_venda (venda_id, produto_codigo, quantidade, preco_unitario) VALUES (?, ?, ?, ?)',
-                           (venda_id, item['codigo'], item['quantidade'], item['preco']))
+            prod = db.execute('SELECT custo FROM produtos WHERE codigo = ?', (item['codigo'],)).fetchone()
+            custo_unit = prod['custo'] if prod else 0.0
+            
+            cursor.execute('INSERT INTO itens_venda (venda_id, produto_codigo, quantidade, preco_unitario, custo_unitario) VALUES (?, ?, ?, ?, ?)',
+                           (venda_id, item['codigo'], item['quantidade'], item['preco'], custo_unit))
             cursor.execute('UPDATE produtos SET estoque = estoque - ? WHERE codigo = ?', 
                            (item['quantidade'], item['codigo']))
         
@@ -277,68 +270,99 @@ def realizar_venda():
         db.close()
         return jsonify({'sucesso': False, 'erro': str(e)}), 500
 
-@app.route('/api/vendas/historico', methods=['GET'])
-def historico_vendas():
+# RELATÓRIOS DINÂMICOS
+@app.route('/api/relatorios/fluxo-caixa', methods=['GET'])
+def relatorio_fluxo_caixa():
+    ano = request.args.get('ano', '2026')
     db = get_db()
-    vendas = db.execute('''
-        SELECT v.id, strftime('%H:%M', v.data_venda) as hora, v.total, v.forma_pagamento,
-               GROUP_CONCAT(i.quantidade || 'x ' || p.nome, ', ') as itens
+    
+    meses_nomes = ["Jan", "Fev", "Mar", "Abr", "Mai", "Jun", "Jul", "Ago", "Set", "Out", "Nov", "Dez"]
+    resultado = []
+
+    for idx, mes in enumerate(meses_nomes, start=1):
+        str_mes = f"{ano}-{idx:02d}"
+
+        vendas = db.execute("SELECT SUM(total) as total FROM vendas WHERE strftime('%Y-%m', data_venda) = ?", (str_mes,)).fetchone()
+        faturamento = vendas['total'] or 0.0
+
+        custos = db.execute('''
+            SELECT SUM(i.quantidade * i.custo_unitario) as total_custo
+            FROM itens_venda i
+            JOIN vendas v ON i.venda_id = v.id
+            WHERE strftime('%Y-%m', v.data_venda) = ?
+        ''', (str_mes,)).fetchone()
+        cpv = custos['total_custo'] or 0.0
+
+        saidas = db.execute("SELECT SUM(valor) as total FROM movimentacoes_caixa WHERE strftime('%Y-%m', data_movimentacao) = ?", (str_mes,)).fetchone()
+        despesas = saidas['total'] or 0.0
+
+        lucro_bruto = faturamento - cpv
+        lucro_liquido = lucro_bruto - despesas
+
+        resultado.append({
+            'mes': f"{mes}/{ano[2:]}",
+            'faturamento': faturamento,
+            'custo_produtos': cpv,
+            'lucro_bruto': lucro_bruto,
+            'despesas': despesas,
+            'lucro_liquido': lucro_liquido
+        })
+
+    db.close()
+    return jsonify(resultado)
+
+@app.route('/api/relatorios/vendas-detalhado', methods=['GET'])
+def relatorio_vendas():
+    inicio = request.args.get('inicio')
+    fim = request.args.get('fim')
+    
+    db = get_db()
+    query = '''
+        SELECT v.id, v.data_venda, v.total, v.forma_pagamento,
+               GROUP_CONCAT(i.quantidade || 'x ' || p.nome, ', ') as descricao_itens
         FROM vendas v
         JOIN itens_venda i ON v.id = i.venda_id
         JOIN produtos p ON i.produto_codigo = p.codigo
-        GROUP BY v.id
-        ORDER BY v.data_venda DESC
-    ''').fetchall()
+    '''
+    params = []
+    if inicio and fim:
+        query += ' WHERE date(v.data_venda) BETWEEN date(?) AND date(?)'
+        params.extend([inicio, fim])
+        
+    query += ' GROUP BY v.id ORDER BY v.data_venda DESC'
+    
+    vendas = db.execute(query, params).fetchall()
     db.close()
     return jsonify([dict(v) for v in vendas])
 
-@app.route('/api/dashboard/resumo', methods=['GET'])
-def dashboard_resumo():
-    periodo = request.args.get('periodo', 'mes')
+@app.route('/api/relatorios/top-produtos', methods=['GET'])
+def relatorio_top_produtos():
     db = get_db()
-
-    condicao_vendas = "1=1"
-    condicao_saidas = "tipo = 'SAIDA'"
-
-    if periodo == 'hoje':
-        condicao_vendas = "date(data_venda) = date('now', 'localtime')"
-        condicao_saidas += " AND date(data_movimentacao) = date('now', 'localtime')"
-    elif periodo == 'semana':
-        condicao_vendas = "data_venda >= date('now', '-7 days', 'localtime')"
-        condicao_saidas += " AND data_movimentacao >= date('now', '-7 days', 'localtime')"
-    elif periodo == 'mes':
-        condicao_vendas = "strftime('%Y-%m', data_venda) = strftime('%Y-%m', 'now', 'localtime')"
-        condicao_saidas += " AND strftime('%Y-%m', data_movimentacao) = strftime('%Y-%m', 'now', 'localtime')"
-
-    query_vendas = f"SELECT SUM(total) as total, COUNT(*) as qtd FROM vendas WHERE {condicao_vendas}"
-    res_vendas = db.execute(query_vendas).fetchone()
-    
-    query_saidas = f"SELECT SUM(valor) as total FROM movimentacoes_caixa WHERE {condicao_saidas}"
-    res_saidas = db.execute(query_saidas).fetchone()
-
-    faturamento = res_vendas['total'] or 0.0
-    vendas_qtd = res_vendas['qtd'] or 0
-    saidas = res_saidas['total'] or 0.0
-
-    query_formas = f"SELECT forma_pagamento, SUM(total) as total FROM vendas WHERE {condicao_vendas} GROUP BY forma_pagamento"
-    formas = db.execute(query_formas).fetchall()
-    
-    dict_formas = {f['forma_pagamento']: f['total'] for f in formas}
-
+    top = db.execute('''
+        SELECT p.codigo, p.nome, SUM(i.quantidade) as total_vendido, SUM(i.quantidade * i.preco_unitario) as faturamento_total
+        FROM itens_venda i
+        JOIN produtos p ON i.produto_codigo = p.codigo
+        GROUP BY p.codigo
+        ORDER BY total_vendido DESC
+        LIMIT 10
+    ''').fetchall()
     db.close()
+    return jsonify([dict(t) for t in top])
 
-    return jsonify({
-        'faturamento_hoje': faturamento,
-        'vendas_hoje': vendas_qtd,
-        'saidas': saidas,
-        'saldo': faturamento - saidas,
-        'formas_pagamento': {
-            'Dinheiro': dict_formas.get('Dinheiro', 0.0),
-            'PIX': dict_formas.get('PIX', 0.0),
-            'Crédito': dict_formas.get('Crédito', 0.0),
-            'Débito': dict_formas.get('Débito', 0.0)
-        }
-    })
+@app.route('/api/admin/resetar-dados', methods=['POST'])
+def resetar_dados():
+    db = get_db()
+    try:
+        db.execute('DELETE FROM itens_venda')
+        db.execute('DELETE FROM vendas')
+        db.execute('DELETE FROM movimentacoes_caixa')
+        db.execute('DELETE FROM caixa')
+        db.commit()
+        db.close()
+        return jsonify({'sucesso': True, 'mensagem': 'Todos os dados de testes foram apagados com sucesso!'})
+    except Exception as e:
+        db.close()
+        return jsonify({'sucesso': False, 'erro': str(e)}), 500
 
 if __name__ == '__main__':
     init_db()

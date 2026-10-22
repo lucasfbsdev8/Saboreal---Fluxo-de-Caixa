@@ -4,50 +4,59 @@
     <meta charset="UTF-8">
     <title>Relatórios - SABOREAL</title>
     <link rel="stylesheet" href="style.css">
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.2.0"></script>
     <style>
-        .relatorio-header {
+        .tabs-nav {
             display: flex;
-            justify-content: space-between;
-            align-items: center;
+            gap: 10px;
             margin-bottom: 20px;
+            border-bottom: 2px solid #D7CCC8;
+            padding-bottom: 5px;
         }
-        .btn-filtro {
-            background-color: #8D6E63;
-            color: white;
+
+        .tab-btn {
+            background-color: #EFEBE9;
+            color: #5D4037;
             border: none;
-            padding: 8px 16px;
-            border-radius: 20px;
-            cursor: pointer;
+            padding: 10px 18px;
             font-weight: bold;
-            margin-left: 5px;
-        }
-        .btn-filtro.active {
-            background-color: #D9534F;
-        }
-        .chart-container {
-            position: relative;
-            height: 220px;
-            width: 100%;
-            margin-top: 10px;
-        }
-        .pagamento-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 20px;
-            align-items: center;
-        }
-        .pagamento-lista {
-            list-style: none;
-            line-height: 2.2;
+            border-radius: 6px 6px 0 0;
+            cursor: pointer;
             font-size: 0.95rem;
         }
-        .pagamento-lista li {
+
+        .tab-btn.active {
+            background-color: #8D6E63;
+            color: white;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .filter-bar {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+            background-color: #FFF;
+            padding: 12px 15px;
+            border-radius: 6px;
+            margin-bottom: 15px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+
+        .admin-danger-zone {
+            margin-top: 40px;
+            padding: 15px;
+            background-color: #FFEBEE;
+            border: 1px solid #FFCDD2;
+            border-radius: 8px;
             display: flex;
             justify-content: space-between;
-            border-bottom: 1px dashed #A1887F;
-            padding-bottom: 2px;
+            align-items: center;
         }
     </style>
 </head>
@@ -55,90 +64,102 @@
     <div class="app-container">
         <div id="sidebar-container"></div>
         <div class="main-content">
+            
             <div class="top-bar">
-                <h2 id="titulo-relatorios">Relatório financeiro</h2>
+                <h2>RELATÓRIOS & GERENCIAMENTO</h2>
                 <div class="user-info">👤 Gerência</div>
             </div>
+
             <div class="page-body">
                 
-                <!-- VISÃO 1: DASHBOARD -->
-                <div id="visao-dashboard">
-                    <div class="relatorio-header">
-                        <h3 id="lbl-mes-atual" style="color: #3E2723; text-transform: uppercase;">SETEMBRO</h3>
-                        <div>
-                            <button id="btn-filtro-hoje" class="btn-filtro" onclick="filtrarPeriodo('hoje', this)">Hoje</button>
-                            <button id="btn-filtro-semana" class="btn-filtro" onclick="filtrarPeriodo('semana', this)">Semana</button>
-                            <button id="btn-filtro-mes" class="btn-filtro active" onclick="filtrarPeriodo('mes', this)">Mês</button>
-                        </div>
-                    </div>
-
-                    <div class="cards-grid">
-                        <div class="metric-card">
-                            <h4>Entradas</h4>
-                            <div class="value" id="card-entradas" style="color: #2E7D32;">R$ 0,00</div>
-                        </div>
-                        <div class="metric-card">
-                            <h4>Saídas</h4>
-                            <div class="value" id="card-saidas" style="color: #C62828;">R$ 0,00</div>
-                        </div>
-                        <div class="metric-card">
-                            <h4>Saldo</h4>
-                            <div class="value" id="card-saldo" style="color: #1565C0;">R$ 0,00</div>
-                        </div>
-                    </div>
-
-                    <div class="card-panel">
-                        <h3>Entradas x saídas por mês</h3>
-                        <div class="chart-container">
-                            <canvas id="chartEntradasSaidas"></canvas>
-                        </div>
-                    </div>
-
-                    <div class="card-panel">
-                        <h3>Evolução do saldo</h3>
-                        <div class="chart-container">
-                            <canvas id="chartEvolucaoSaldo"></canvas>
-                        </div>
-                    </div>
-
-                    <div class="card-panel">
-                        <h3>Vendas por forma de pagamento</h3>
-                        <div class="pagamento-grid">
-                            <div style="height: 220px;">
-                                <canvas id="chartFormasPagamento"></canvas>
-                            </div>
-                            <ul class="pagamento-lista" id="lista-pagamentos">
-                                <li><span>🟢 Dinheiro</span> <strong id="val-dinheiro">R$ 0,00</strong></li>
-                                <li><span>🔵 PIX</span> <strong id="val-pix">R$ 0,00</strong></li>
-                                <li><span>🟣 Crédito</span> <strong id="val-credito">R$ 0,00</strong></li>
-                                <li><span>🟠 Débito</span> <strong id="val-debito">R$ 0,00</strong></li>
-                            </ul>
-                        </div>
-                    </div>
+                <div class="tabs-nav">
+                    <button class="tab-btn active" onclick="trocarAbaRelatorio('fluxo')">📊 DRE & Fluxo de Caixa</button>
+                    <button class="tab-btn" onclick="trocarAbaRelatorio('vendas')">🛒 Vendas Detalhadas</button>
+                    <button class="tab-btn" onclick="trocarAbaRelatorio('produtos')">🏆 Produtos mais Vendidos</button>
                 </div>
 
-                <!-- VISÃO 2: HISTÓRICO DE VENDAS -->
-                <div id="visao-historico" style="display: none;">
-                    <div class="card-panel">
-                        <h3>Histórico de Vendas (Turno Atual)</h3>
-                        <table class="table-custom" style="margin-top: 15px;">
+                <!-- Aba 1: DRE & Fluxo de Caixa -->
+                <div id="tab-fluxo" class="tab-content active">
+                    <div class="filter-bar">
+                        <label>Ano do Exercício:</label>
+                        <select id="select-ano-fluxo" onchange="carregarFluxoDRE()" class="form-control" style="width: 120px;">
+                            <option value="2026" selected>2026</option>
+                            <option value="2025">2025</option>
+                        </select>
+                    </div>
+
+                    <div class="card-panel" style="overflow-x: auto;">
+                        <table class="table-custom" id="tbl-fluxo-caixa">
                             <thead>
-                                <tr>
-                                    <th>Hora</th>
-                                    <th>Itens</th>
-                                    <th>Pagamento</th>
-                                    <th>Valor</th>
+                                <tr id="tr-fluxo-header">
+                                    <th>Demonstrativo (R$)</th>
                                 </tr>
                             </thead>
-                            <tbody id="tb-historico-vendas">
+                            <tbody id="tb-fluxo-body">
                             </tbody>
                         </table>
                     </div>
                 </div>
 
+                <!-- Aba 2: Vendas Detalhadas -->
+                <div id="tab-vendas" class="tab-content">
+                    <div class="filter-bar">
+                        <label>De:</label>
+                        <input type="date" id="filtro-data-inicio" class="form-control" style="width: auto;">
+                        <label>Até:</label>
+                        <input type="date" id="filtro-data-fim" class="form-control" style="width: auto;">
+                        <button class="btn-primary" onclick="carregarVendasDetalhadas()">Filtrar</button>
+                    </div>
+
+                    <div class="card-panel">
+                        <table class="table-custom">
+                            <thead>
+                                <tr>
+                                    <th># ID</th>
+                                    <th>Data / Hora</th>
+                                    <th>Itens Vendidos</th>
+                                    <th>Forma Pagto</th>
+                                    <th>Total</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tb-vendas-body">
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Aba 3: Top Produtos -->
+                <div id="tab-produtos" class="tab-content">
+                    <div class="card-panel">
+                        <h3>Ranking dos Produtos mais Vendidos</h3>
+                        <table class="table-custom" style="margin-top: 15px;">
+                            <thead>
+                                <tr>
+                                    <th>Código</th>
+                                    <th>Produto</th>
+                                    <th>Qtd. Vendida</th>
+                                    <th>Faturamento Acumulado</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tb-top-produtos">
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Área de Reset para Entrega -->
+                <div class="admin-danger-zone">
+                    <div>
+                        <strong style="color: #C62828;">⚠️ Zerar Dados de Teste / Simulação</strong>
+                        <p style="margin: 3px 0 0 0; font-size: 0.85rem; color: #5D4037;">Limpa o histórico de vendas, saídas e caixas. Mantém o cadastro de produtos.</p>
+                    </div>
+                    <button class="btn-primary" style="background-color: #C02E28;" onclick="resetarDadosTeste()">Zerar Sistema para Entrega</button>
+                </div>
+
             </div>
         </div>
     </div>
+
     <script src="api.js"></script>
     <script src="sidebar.js"></script>
     <script src="relatorios.js"></script>

@@ -1,53 +1,65 @@
--- Criacao do Schema do Banco de Dados SABOREAL
+DROP TABLE IF EXISTS itens_venda;
+DROP TABLE IF EXISTS vendas;
+DROP TABLE IF EXISTS movimentacoes_caixa;
+DROP TABLE IF EXISTS caixa;
+DROP TABLE IF EXISTS produtos;
+DROP TABLE IF EXISTS usuarios;
 
-CREATE TABLE IF NOT EXISTS usuarios (
+-- Usuários do Sistema
+CREATE TABLE usuarios (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
-    usuario TEXT NOT NULL UNIQUE,
+    usuario TEXT UNIQUE NOT NULL,
     senha TEXT NOT NULL,
-    cargo TEXT NOT NULL DEFAULT 'Gerência'
+    cargo TEXT NOT NULL
 );
 
-CREATE TABLE IF NOT EXISTS produtos (
+-- Produtos
+CREATE TABLE produtos (
     codigo TEXT PRIMARY KEY,
     nome TEXT NOT NULL,
     categoria TEXT NOT NULL,
     preco_venda REAL NOT NULL,
     custo REAL DEFAULT 0.0,
-    estoque INTEGER NOT NULL DEFAULT 0,
-    status TEXT NOT NULL DEFAULT 'ATIVO'
+    estoque INTEGER DEFAULT 0,
+    status TEXT DEFAULT 'ATIVO'
 );
 
-CREATE TABLE IF NOT EXISTS caixa (
+-- Registros de Caixa
+CREATE TABLE caixa (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     operador TEXT NOT NULL,
-    valor_abertura REAL NOT NULL,
     data_abertura DATETIME DEFAULT CURRENT_TIMESTAMP,
     data_fechamento DATETIME,
+    valor_abertura REAL NOT NULL,
     valor_fechamento REAL,
-    status TEXT NOT NULL DEFAULT 'ABERTO',
+    status TEXT DEFAULT 'ABERTO',
     observacao TEXT
 );
 
-CREATE TABLE IF NOT EXISTS vendas (
+-- Vendas
+CREATE TABLE vendas (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
+    caixa_id INTEGER,
     data_venda DATETIME DEFAULT CURRENT_TIMESTAMP,
     total REAL NOT NULL,
     forma_pagamento TEXT NOT NULL,
-    caixa_id INTEGER,
-    FOREIGN KEY(caixa_id) REFERENCES caixa(id)
+    FOREIGN KEY (caixa_id) REFERENCES caixa(id)
 );
 
-CREATE TABLE IF NOT EXISTS itens_venda (
+-- Itens da Venda
+CREATE TABLE itens_venda (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     venda_id INTEGER NOT NULL,
     produto_codigo TEXT NOT NULL,
     quantidade INTEGER NOT NULL,
     preco_unitario REAL NOT NULL,
-    FOREIGN KEY(venda_id) REFERENCES vendas(id),
-    FOREIGN KEY(produto_codigo) REFERENCES produtos(codigo)
+    custo_unitario REAL DEFAULT 0.0,
+    FOREIGN KEY (venda_id) REFERENCES vendas(id),
+    FOREIGN KEY (produto_codigo) REFERENCES produtos(codigo)
 );
 
-CREATE TABLE IF NOT EXISTS movimentacoes_caixa (
+-- Movimentações de Saída / Despesas
+CREATE TABLE movimentacoes_caixa (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     tipo TEXT NOT NULL,
     categoria TEXT NOT NULL,
@@ -58,30 +70,5 @@ CREATE TABLE IF NOT EXISTS movimentacoes_caixa (
     data_movimentacao DATETIME DEFAULT CURRENT_TIMESTAMP
 );
 
-CREATE TABLE IF NOT EXISTS fluxo_caixa_mensal (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    mes TEXT NOT NULL,
-    saldo_inicial REAL NOT NULL,
-    entradas REAL NOT NULL,
-    saidas REAL NOT NULL,
-    lucro REAL NOT NULL,
-    saldo REAL NOT NULL
-);
-
--- Carga Inicial Apenas de Usuarios e Produtos
-INSERT OR IGNORE INTO usuarios (usuario, senha, cargo) VALUES ('admin', '1234', 'Gerência');
-
-INSERT OR IGNORE INTO produtos (codigo, nome, categoria, preco_venda, estoque) VALUES 
-('01', 'Biscoito', 'Biscoitos', 2.00, 87),
-('02', 'Pedaço de bolo', 'Bolos', 2.50, 15),
-('03', 'Roda de bolo', 'Bolos', 12.00, 3),
-('04', 'Sonho', 'Doces', 2.50, 7),
-('05', 'Pudim', 'Pudim', 10.00, 2);
-
-INSERT OR IGNORE INTO fluxo_caixa_mensal (id, mes, saldo_inicial, entradas, saidas, lucro, saldo) VALUES
-(1, 'Abril', 6057.70, 15328.00, 6195.20, 9132.80, 15190.50),
-(2, 'Maio', 15190.50, 13890.00, 6047.80, 7842.20, 23032.70),
-(3, 'Junho', 23032.70, 13406.00, 5963.10, 7442.90, 30475.60),
-(4, 'Julho', 30475.60, 14355.00, 6109.40, 8245.60, 38721.20),
-(5, 'Agosto', 38721.20, 14050.00, 6096.00, 7954.00, 46675.20),
-(6, 'Setembro', 46675.20, 15128.00, 5931.20, 9196.80, 55872.00);
+-- Inserir usuário padrão
+INSERT INTO usuarios (usuario, senha, cargo) VALUES ('admin', '1234', 'GERENTE');
