@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Relatórios - SABOREAL</title>
+    <link rel="icon" href="imagens/icone.png">
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<div class="app-container">
+    <div id="sidebar-container"></div>
+    <main class="main-content">
+        <header class="top-bar"><h2>Relatórios</h2></header>
+        <div class="page-body">
+            <div class="tab-bar" role="tablist">
+                <button type="button" class="tab-btn" data-aba="fluxo" role="tab">📊 Fluxo de caixa</button>
+                <button type="button" class="tab-btn" data-aba="vendas" role="tab">🛒 Histórico de vendas</button>
+                <button type="button" class="tab-btn" data-aba="produtos" role="tab">🏆 Mais vendidos</button>
+            </div>
+
+            <!-- Fluxo de caixa diário -->
+            <section id="tab-fluxo" class="card-panel" hidden>
+                <div class="filtros">
+                    <div class="form-group">
+                        <label for="select-mes-fluxo">Mês</label>
+                        <select id="select-mes-fluxo" class="form-control"></select>
+                    </div>
+                    <div class="form-group">
+                        <label for="select-ano-fluxo">Ano</label>
+                        <select id="select-ano-fluxo" class="form-control"></select>
+                    </div>
+                </div>
+                <div class="table-wrap">
+                    <table class="table-custom tabela-fluxo">
+                        <thead id="th-fluxo"></thead>
+                        <tbody id="tb-fluxo-body"></tbody>
+                    </table>
+                </div>
+                <p class="nota">
+                    Caixa = dinheiro (vendas em dinheiro e saídas pagas em dinheiro). Banco = PIX e cartões (vendas por PIX/cartão
+                    e saídas pagas por PIX/cartão). O dinheiro informado no primeiro acesso entra no saldo do caixa.
+                    Saldo final = saldo em caixa + saldo no banco. O saldo inicial de cada dia é o saldo final do dia anterior.
+                    Reforço de caixa e quebra/sobra não entram nesta tabela.
+                </p>
+            </section>
+
+            <!-- Histórico de vendas -->
+            <section id="tab-vendas" class="card-panel" hidden>
+                <div class="filtros">
+                    <div class="form-group"><label for="vendas-inicio">De</label><input type="date" id="vendas-inicio" class="form-control"></div>
+                    <div class="form-group"><label for="vendas-fim">Até</label><input type="date" id="vendas-fim" class="form-control"></div>
+                    <button type="button" id="btn-filtrar-vendas" class="btn-primary">Filtrar</button>
+                </div>
+                <div class="table-wrap">
+                    <table class="table-custom">
+                        <thead><tr><th>Venda</th><th>Data e hora</th><th>Itens</th><th>Pagamento</th><th class="num">Total</th></tr></thead>
+                        <tbody id="tb-vendas-body"></tbody>
+                        <tfoot id="tf-vendas"></tfoot>
+                    </table>
+                </div>
+            </section>
+ 
+            <!-- Mais vendidos -->
+            <section id="tab-produtos" class="card-panel" hidden>
+                <div class="filtros">
+                    <div class="form-group"><label for="top-inicio">De</label><input type="date" id="top-inicio" class="form-control"></div>
+                    <div class="form-group"><label for="top-fim">Até</label><input type="date" id="top-fim" class="form-control"></div>
+                    <button type="button" id="btn-filtrar-top" class="btn-primary">Filtrar</button>
+                </div>
+                <div class="table-wrap">
+                    <table class="table-custom">
+                        <thead><tr><th>Cód.</th><th>Produto</th><th class="num">Qtd. vendida</th><th class="num">Faturamento</th></tr></thead>
+                        <tbody id="tb-top-produtos"></tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- Área do gerente -->
+            <section id="area-gerente" class="card-panel" hidden>
+                <h3>Área do gerente</h3>
+                <p class="dica">Entrega em modo limpo: apaga vendas, saídas, caixas e produtos, e recria os 39 produtos iniciais com o estoque de partida. Use antes de entregar o sistema ao cliente.</p>
+                <button type="button" id="btn-restaurar" class="btn-danger">Restaurar sistema para uso real</button>
+            </section>
+        </div>
+    </main>
+</div>
+<script src="js/utils.js"></script>
+<script src="js/api.js"></script>
+<script src="js/layout.js"></script>
+<script src="js/relatorios.js"></script>
+</body>
+</html>

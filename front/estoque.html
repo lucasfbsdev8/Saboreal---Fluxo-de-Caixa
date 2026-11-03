@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Adicionar estoque - SABOREAL</title>
+    <link rel="icon" href="imagens/icone.png">
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<div class="app-container">
+    <div id="sidebar-container"></div>
+    <main class="main-content">
+        <header class="top-bar"><h2>Adicionar estoque</h2></header>
+        <div class="page-body">
+            <section class="card-panel">
+                <div class="filtros">
+                    <div class="form-group">
+                        <label for="inp-busca">Buscar produto</label>
+                        <input type="search" id="inp-busca" class="form-control" style="width:300px" placeholder="🔍 Código ou nome…" autocomplete="off">
+                    </div>
+                </div>
+                <div id="chips-categoria" class="chips" role="group" aria-label="Filtrar por categoria"></div>
+                <p class="dica">Use números positivos para entrada (ex.: 20) e negativos para baixa (ex.: -5).</p>
+                <div class="table-wrap">
+                    <table class="table-custom">
+                        <thead><tr><th>Cód.</th><th>Produto</th><th>Categoria</th><th class="num">Estoque atual</th><th>Ajustar (+ / −)</th></tr></thead>
+                        <tbody id="tb-estoque"></tbody>
+                    </table>
+                </div>
+            </section>
+        </div>
+    </main>
+</div>
+<script src="js/utils.js"></script>
+<script src="js/api.js"></script>
+<script src="js/layout.js"></script>
+<script src="js/estoque.js"></script>
+</body>
+</html>

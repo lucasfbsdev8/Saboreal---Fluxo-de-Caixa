@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nova venda - SABOREAL</title>
+    <link rel="icon" href="imagens/icone.png">
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<div class="app-container">
+    <div id="sidebar-container"></div>
+    <main class="main-content">
+        <header class="top-bar"><h2>Nova venda</h2></header>
+        <div class="page-body pdv">
+            <section>
+                <label for="inp-busca-prod" class="sr-only">Buscar produto</label>
+                <input type="search" id="inp-busca-prod" class="form-control" placeholder="🔍 Buscar por nome ou código (Enter adiciona se houver só um)" autocomplete="off" autofocus>
+                <div id="chips-categoria" class="chips" role="group" aria-label="Filtrar por categoria"></div>
+                <div id="grid-produtos" class="products-grid"></div>
+            </section>
+
+            <aside class="pdv-carrinho card-panel" aria-label="Carrinho">
+                <h3>Carrinho</h3>
+                <div id="lista-carrinho" class="cart-list"></div>
+                <div class="cart-total">
+                    <span><span id="lbl-total-itens">0</span> itens</span>
+                    <strong id="lbl-total-valor">R$ 0,00</strong>
+                </div>
+                <button type="button" id="btn-finalizar" class="btn-success btn-block">Finalizar venda</button>
+                <button type="button" id="btn-limpar" class="btn-secondary btn-block">Limpar carrinho</button>
+            </aside>
+        </div>
+
+        <div class="modal-overlay" id="modal-pagamento" hidden>
+            <div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="titulo-pagamento">
+                <h3 id="titulo-pagamento">Pagamento</h3>
+                <div class="form-group">
+                    <label for="select-forma-pagamento">Forma de pagamento</label>
+                    <select id="select-forma-pagamento" class="form-control">
+                        <option value="Dinheiro">Dinheiro</option>
+                        <option value="PIX">PIX</option>
+                        <option value="Crédito">Cartão de crédito</option>
+                        <option value="Débito">Cartão de débito</option>
+                    </select>
+                </div>
+                <div id="box-troco" class="form-group">
+                    <label for="inp-valor-recebido">Valor recebido</label>
+                    <input type="text" id="inp-valor-recebido" class="form-control" data-moeda inputmode="numeric" autocomplete="off">
+                    <p id="lbl-troco" style="margin-top:8px"></p>
+                </div>
+                <p>Total da venda: <strong id="lbl-total-modal"></strong></p>
+                <div class="modal-actions">
+                    <button type="button" id="btn-cancelar-pagamento" class="btn-secondary">Voltar</button>
+                    <button type="button" id="btn-confirmar-venda" class="btn-success">Confirmar venda</button>
+                </div>
+            </div>
+        </div>
+    </main>
+</div>
+<script src="js/utils.js"></script>
+<script src="js/api.js"></script>
+<script src="js/layout.js"></script>
+<script src="js/vendas.js"></script>
+</body>
+</html>
