@@ -70,7 +70,8 @@ CREATE INDEX IF NOT EXISTS ix_mov_data ON movimentacoes_caixa(data_movimentacao)
 
 CREATE TABLE IF NOT EXISTS implantacao (
     id INTEGER PRIMARY KEY CHECK (id = 1),
-    valor_inicial INTEGER NOT NULL CHECK (valor_inicial >= 0),
+    saldo_caixa INTEGER NOT NULL CHECK (saldo_caixa >= 0),   -- dinheiro (espécie) que havia no caixa
+    saldo_banco INTEGER NOT NULL CHECK (saldo_banco >= 0),   -- dinheiro que havia no banco (PIX/conta)
     data_registro DATETIME NOT NULL DEFAULT (datetime('now', 'localtime')),
     usuario TEXT NOT NULL,
     observacao TEXT

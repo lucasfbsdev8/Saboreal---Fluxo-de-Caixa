@@ -217,3 +217,8 @@ button:disabled { opacity: .55; cursor: not-allowed; }
 /* ---------- 14. Blocos de saldo (caixa x banco) no fluxo de caixa ---------- */
 .tabela-fluxo tr.linha-faixa td { background: var(--marrom); color: #FFF; font-weight: bold; font-size: .8rem; letter-spacing: .5px; }
 .tabela-fluxo tr.linha-subtotal td { background: #F5EFEC; font-weight: bold; }
+
+/* ---------- 15. Abertura de caixa: saldo em destaque ---------- */
+.saldo-destaque { background: #FFF; border-left: 6px solid var(--verde); border-radius: 8px; padding: 18px 20px; margin-bottom: 16px; text-align: center; }
+.saldo-destaque .rotulo { display: block; font-size: .9rem; font-weight: bold; color: var(--marrom-texto); margin-bottom: 6px; }
+.saldo-destaque strong { font-size: 2rem; color: var(--marrom-escuro); }

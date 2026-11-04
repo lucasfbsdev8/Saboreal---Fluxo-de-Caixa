@@ -17,28 +17,13 @@
             <!-- Abrir caixa -->
             <section id="secao-abrir" class="card-panel form-narrow" hidden>
                 <form id="form-abrir">
-                    <div class="form-group">
-                        <label for="abrir-operador">Operador</label>
-                        <input type="text" id="abrir-operador" class="form-control" readonly>
-                    </div>
-                    <div class="resumo-linhas">
-                        <div class="linha"><span>Saldo anterior no caixa</span><strong id="lbl-saldo-anterior">R$ 0,00</strong></div>
-                    </div>
-                    <div class="form-group">
-                        <label for="abrir-reforco">Reforço de caixa (moedas para troco)</label>
-                        <input type="text" id="abrir-reforco" class="form-control" data-moeda inputmode="numeric" autocomplete="off">
-                    </div>
-                    <div class="resumo-linhas">
-                        <div class="linha"><span>Total na abertura</span><strong id="lbl-total-abertura">R$ 0,00</strong></div>
-                    </div>
-                    <div class="form-group">
-                        <label for="abrir-obs">Observação</label>
-                        <input type="text" id="abrir-obs" class="form-control" maxlength="200" placeholder="Ex.: reforço de moedas para troco">
+                    <div class="saldo-destaque">
+                        <span class="rotulo">Saldo atual em caixa (dinheiro)</span>
+                        <strong id="lbl-saldo-abertura">R$ 0,00</strong>
                     </div>
                     <button type="submit" class="btn-success btn-block">Abrir caixa</button>
                 </form>
             </section>
-
             <!-- Fechar caixa -->
             <section id="secao-fechar" class="card-panel form-narrow" hidden>
                 <div class="resumo-linhas">

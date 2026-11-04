@@ -14,27 +14,18 @@ async function enviar(form, acao) {
 }
 
 function iniciarAbrir(status) {
-    const anterior = status.ultimo_valor_fechamento || 0;
-    $('abrir-operador').value = Sessao.usuario();
-    $('lbl-saldo-anterior').textContent = formatarMoeda(anterior);
-
-    const atualizarTotal = () => { $('lbl-total-abertura').textContent = formatarMoeda(anterior + lerCentavos($('abrir-reforco'))); };
-    $('abrir-reforco').addEventListener('input', atualizarTotal);
-    atualizarTotal();
+    // O caixa abre com o dinheiro que já existe: último fechamento (ou saldo informado na implantação).
+    $('lbl-saldo-abertura').textContent = formatarMoeda(status.ultimo_valor_fechamento || 0);
 
     $('form-abrir').addEventListener('submit', e => {
         e.preventDefault();
         enviar(e.target, async () => {
-            const res = await apiRequest('/caixa/abrir', 'POST', {
-                reforco: lerCentavos($('abrir-reforco')),
-                observacao: $('abrir-obs').value,
-            });
+            const res = await apiRequest('/caixa/abrir', 'POST', {});
             if (res?.sucesso) concluir('Caixa aberto com sucesso!');
             return !!res?.sucesso;
         });
     });
 }
-
 function iniciarFechar(status) {
     const esperado = status.gaveta_esperada;
     $('lbl-fechar-abertura').textContent = formatarMoeda(status.valor_abertura);

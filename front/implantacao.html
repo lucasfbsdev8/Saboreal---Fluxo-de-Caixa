@@ -12,14 +12,19 @@
         <img src="imagens/logo.png" alt="" class="logo-implantacao">
         <h1>Bem-vindo ao Saboreal!</h1>
         <p class="dica">
-            Antes de começar, informe quanto dinheiro havia no caixa antes de passar a usar o sistema
-            (conte o dinheiro da gaveta agora). Esse valor será o saldo inicial do primeiro caixa e do fluxo de caixa.
+            Antes de começar, informe os saldos que a empresa tinha antes de passar a usar o sistema: o dinheiro
+            em espécie no caixa (conte a gaveta agora) e o saldo no banco (conta/PIX). Esses valores serão os saldos
+            iniciais do caixa e do banco no fluxo de caixa.
         </p>
 
         <form id="form-implantacao">
             <div class="form-group">
-                <label for="valor-inicial">Dinheiro no caixa hoje</label>
-                <input type="text" id="valor-inicial" class="form-control" data-moeda inputmode="numeric" autocomplete="off" required>
+                <label for="saldo-caixa">Saldo Inicial em Caixa (R$)</label>
+                <input type="text" id="saldo-caixa" class="form-control" data-moeda inputmode="numeric" autocomplete="off" required>
+            </div>
+            <div class="form-group">
+                <label for="saldo-banco">Saldo Inicial em Banco (R$)</label>
+                <input type="text" id="saldo-banco" class="form-control" data-moeda inputmode="numeric" autocomplete="off" required>
             </div>
             <div class="form-group">
                 <label for="obs-implantacao">Observação (opcional)</label>
@@ -29,7 +34,7 @@
         </form>
 
         <div id="aviso-sem-permissao" hidden>
-            <p class="dica">O saldo inicial do caixa ainda não foi informado. Peça ao gerente para entrar no sistema e registrá-lo.</p>
+            <p class="dica">Os saldos iniciais de caixa e banco ainda não foram informados. Peça ao gerente para entrar no sistema e registrá-los.</p>
             <button type="button" id="btn-sair-implantacao" class="btn-secondary btn-block">Sair</button>
         </div>
     </main>

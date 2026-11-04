@@ -15,8 +15,7 @@
         <div class="page-body">
             <div class="tab-bar" role="tablist">
                 <button type="button" class="tab-btn" data-aba="fluxo" role="tab">📊 Fluxo de caixa</button>
-                <button type="button" class="tab-btn" data-aba="vendas" role="tab">🛒 Histórico de vendas</button>
-                <button type="button" class="tab-btn" data-aba="produtos" role="tab">🏆 Mais vendidos</button>
+                <button type="button" class="tab-btn" data-aba="movimentacoes" role="tab">🧾 Histórico de movimentações</button>
             </div>
 
             <!-- Fluxo de caixa diário -->
@@ -45,33 +44,18 @@
                 </p>
             </section>
 
-            <!-- Histórico de vendas -->
-            <section id="tab-vendas" class="card-panel" hidden>
+            <!-- Histórico de movimentações (entradas e saídas) -->
+            <section id="tab-movimentacoes" class="card-panel" hidden>
                 <div class="filtros">
-                    <div class="form-group"><label for="vendas-inicio">De</label><input type="date" id="vendas-inicio" class="form-control"></div>
-                    <div class="form-group"><label for="vendas-fim">Até</label><input type="date" id="vendas-fim" class="form-control"></div>
-                    <button type="button" id="btn-filtrar-vendas" class="btn-primary">Filtrar</button>
+                    <div class="form-group"><label for="mov-inicio">De</label><input type="date" id="mov-inicio" class="form-control"></div>
+                    <div class="form-group"><label for="mov-fim">Até</label><input type="date" id="mov-fim" class="form-control"></div>
+                    <button type="button" id="btn-filtrar-mov" class="btn-primary">Filtrar</button>
                 </div>
                 <div class="table-wrap">
                     <table class="table-custom">
-                        <thead><tr><th>Venda</th><th>Data e hora</th><th>Itens</th><th>Pagamento</th><th class="num">Total</th></tr></thead>
-                        <tbody id="tb-vendas-body"></tbody>
-                        <tfoot id="tf-vendas"></tfoot>
-                    </table>
-                </div>
-            </section>
- 
-            <!-- Mais vendidos -->
-            <section id="tab-produtos" class="card-panel" hidden>
-                <div class="filtros">
-                    <div class="form-group"><label for="top-inicio">De</label><input type="date" id="top-inicio" class="form-control"></div>
-                    <div class="form-group"><label for="top-fim">Até</label><input type="date" id="top-fim" class="form-control"></div>
-                    <button type="button" id="btn-filtrar-top" class="btn-primary">Filtrar</button>
-                </div>
-                <div class="table-wrap">
-                    <table class="table-custom">
-                        <thead><tr><th>Cód.</th><th>Produto</th><th class="num">Qtd. vendida</th><th class="num">Faturamento</th></tr></thead>
-                        <tbody id="tb-top-produtos"></tbody>
+                        <thead><tr><th>Tipo</th><th>Data e hora</th><th>Descrição</th><th>Pagamento</th><th class="num">Valor</th></tr></thead>
+                        <tbody id="tb-mov-body"></tbody>
+                        <tfoot id="tf-mov"></tfoot>
                     </table>
                 </div>
             </section>

@@ -18,19 +18,19 @@ Abra **http://127.0.0.1:5000** no navegador.
 - O banco (`banco/saboreal.db`) e a chave de sessão (`banco/.secret_key`) são criados sozinhos na primeira execução, **já com os 39 produtos iniciais** e o estoque de partida. Os dados **não são apagados** ao reiniciar o servidor.
 - Se você tinha um `saboreal.db` de uma versão anterior, apague-o antes (o formato mudou). O sistema avisa se encontrar um antigo.
 
-### Implantação e entrega ao cliente (modo limpo)
+### Primeiro acesso (saldo inicial do caixa)
 
-O sistema possui um fluxo dedicado de **Implantação** e restauração de fábrica.
+No primeiro login do gerente, o sistema abre a tela `implantacao.html` e pede o dinheiro que havia no caixa antes de passar a usar o sistema. Esse valor é registrado **uma única vez** (não pode ser alterado) e passa a ser o saldo anterior do primeiro caixa e o saldo inicial em dinheiro do fluxo de caixa. Enquanto não for informado, as demais telas ficam bloqueadas.
 
-- **Pela interface (Implantação):** Ao acessar o sistema em modo de implantação/entrega, acesse a página de Implantação (`implantacao.html`) e execute o procedimento de limpeza e reinicialização dos dados do cliente.
-- **Pela tela de Relatórios:** Usuários gerentes podem acionar a restauração para uso real informando a senha de confirmação.
-- **Pelo terminal:** `python back/app.py --restaurar-fabrica` (pede a confirmação digitando `RESTAURAR`).
+### Entregar ao cliente (modo limpo)
 
-Ao restaurar o sistema, as vendas, saídas, movimentações de caixa e produtos são redefinidos e recria-se o catálogo dos 39 produtos iniciais com o estoque de partida (mantendo as contas de usuário).
+Depois de testar, restaure o sistema para uso real. Isso apaga vendas, saídas, caixas, produtos e o saldo inicial informado, e recria os 39 produtos iniciais com o estoque de partida (os usuários são mantidos). No próximo login, o gerente informa o saldo inicial real do caixa. Duas formas:
+
+- **Pela tela:** entre como gerente, vá em **Relatórios** e use **Restaurar sistema para uso real** (pede a senha).
+- **Pelo terminal:** `python back/app.py --restaurar-fabrica` (pede para digitar `RESTAURAR`).
 
 Estoque de partida (por produto): Biscoitos 50 · Doces 20 · Bolos 8 · Salgados 25 · Bebidas 15.
 A lista de produtos e preços está em `back/seed.py`.
-
 ### Trocar a senha do admin
 
 ```bash
@@ -79,7 +79,8 @@ Saboreal/
 - **Preço e total da venda são calculados no servidor**; o navegador só envia código e quantidade.
 - **Dinheiro em centavos** (inteiros) no banco e na API; o front formata para R$.
 
-## Relatórios
+## Relatórios e saldos
 
-- **Fluxo de caixa:** escolha mês e ano; uma coluna por dia. Entradas por forma de pagamento (dinheiro, PIX, crédito, débito), saídas por categoria, saldo operacional (entradas − saídas), saldo inicial (saldo final do dia anterior; R$ 0,00 no primeiro dia com movimento) e saldo final. Reforço de caixa e quebra/sobra não entram no fluxo.
+- **Fluxo de caixa:** escolha mês e ano; uma coluna por dia. Entradas por forma de pagamento, saídas por categoria e saldo operacional (entradas − saídas). Os saldos são separados em **caixa (dinheiro)** e **banco (PIX e cartões)**, e o saldo final é a soma dos dois. O saldo inicial é o valor informado no primeiro acesso mais o que já entrou e saiu antes; cada dia começa com o saldo final do dia anterior. Dias futuros ou anteriores à implantação aparecem como "-". Reforço de caixa e quebra/sobra não entram no fluxo.
+- **Tela inicial e relatório usam a mesma regra** (`back/saldos.py`): saldo em dinheiro = saldo inicial + vendas em dinheiro − saídas em dinheiro; saldo no banco = vendas por PIX/cartão − saídas por PIX/cartão; total = soma dos dois.
 - **Histórico de vendas** e **Mais vendidos**, com filtro por período.

@@ -150,35 +150,28 @@ def fluxo_caixa():
     })
 
 
-@bp.get('/relatorios/vendas-detalhado')
+@bp.get('/relatorios/movimentacoes')
 @exige_login
-def vendas_detalhado():
-    filtro, params = _filtro_periodo('v.data_venda')
+def movimentacoes():
+    """Histórico unificado do período: vendas (Entrada) e saídas de caixa (Saída), da mais recente para a mais antiga."""
+    filtro_venda, params_venda = _filtro_periodo('v.data_venda')
+    filtro_saida, params_saida = _filtro_periodo('m.data_movimentacao')
     linhas = get_db().execute(
-        "SELECT v.id, v.data_venda, v.total, v.forma_pagamento, "
-        "GROUP_CONCAT(i.quantidade || 'x ' || COALESCE(p.nome, i.produto_codigo), ', ') AS descricao_itens "
+        "SELECT 'Entrada' AS tipo, v.id AS id, v.data_venda AS data, v.total AS valor, "
+        "v.forma_pagamento AS forma_pagamento, "
+        "'Venda #' || v.id || ': ' || "
+        "COALESCE(GROUP_CONCAT(i.quantidade || 'x ' || COALESCE(p.nome, i.produto_codigo), ', '), '-') AS descricao "
         'FROM vendas v '
         'LEFT JOIN itens_venda i ON i.venda_id = v.id '
         'LEFT JOIN produtos p ON p.codigo = i.produto_codigo '
-        f'WHERE 1 = 1 {filtro} '
-        'GROUP BY v.id ORDER BY v.data_venda DESC, v.id DESC',
-        params,
-    ).fetchall()
-    return jsonify([dict(l) for l in linhas])
-
-
-@bp.get('/relatorios/top-produtos')
-@exige_login
-def top_produtos():
-    filtro, params = _filtro_periodo('v.data_venda')
-    linhas = get_db().execute(
-        'SELECT i.produto_codigo AS codigo, COALESCE(p.nome, i.produto_codigo) AS nome, '
-        'SUM(i.quantidade) AS total_vendido, SUM(i.quantidade * i.preco_unitario) AS faturamento_total '
-        'FROM itens_venda i '
-        'JOIN vendas v ON v.id = i.venda_id '
-        'LEFT JOIN produtos p ON p.codigo = i.produto_codigo '
-        f'WHERE 1 = 1 {filtro} '
-        'GROUP BY i.produto_codigo ORDER BY total_vendido DESC LIMIT 10',
-        params,
+        f'WHERE 1 = 1 {filtro_venda} '
+        'GROUP BY v.id '
+        'UNION ALL '
+        "SELECT 'Saída', m.id, m.data_movimentacao, m.valor, m.forma_pagamento, "
+        "m.categoria || CASE WHEN COALESCE(m.descricao, '') <> '' THEN ': ' || m.descricao ELSE '' END "
+        'FROM movimentacoes_caixa m '
+        f"WHERE m.tipo = 'SAIDA' {filtro_saida} "
+        'ORDER BY data DESC, id DESC',
+        params_venda + params_saida,
     ).fetchall()
     return jsonify([dict(l) for l in linhas])

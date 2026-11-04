@@ -1,5 +1,5 @@
 const $ = id => document.getElementById(id);
-const ABAS = ['fluxo', 'vendas', 'produtos'];
+const ABAS = ['fluxo', 'movimentacoes'];
 const carregadas = new Set();   // cada aba só busca dados na primeira vez que é aberta
 
 const MESES = ['Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho', 'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'];
@@ -21,7 +21,7 @@ function mostrarAba(nome) {
     });
     if (!carregadas.has(nome)) {
         carregadas.add(nome);
-        ({ fluxo: carregarFluxo, vendas: carregarVendas, produtos: carregarTop })[nome]();
+        ({ fluxo: carregarFluxo, movimentacoes: carregarMovimentacoes })[nome]();
     }
 }
 
@@ -81,7 +81,7 @@ function renderizarFluxo(res) {
         linha('SALDO FINAL (caixa + banco)', c => c.saldo_final, { classe: 'linha-saldo-final', sinal: true }),
     ].join('');}
 
-/* ---------- Histórico de vendas e mais vendidos ---------- */
+/* ---------- Histórico de movimentações (entradas e saídas) ---------- */
 function periodo(idInicio, idFim) {
     const params = new URLSearchParams();
     if ($(idInicio).value) params.set('inicio', $(idInicio).value);
@@ -90,39 +90,30 @@ function periodo(idInicio, idFim) {
     return texto ? `?${texto}` : '';
 }
 
-async function carregarVendas() {
-    const vendas = await apiRequest(`/relatorios/vendas-detalhado${periodo('vendas-inicio', 'vendas-fim')}`);
-    if (!vendas) return;
+async function carregarMovimentacoes() {
+    const lista = await apiRequest(`/relatorios/movimentacoes${periodo('mov-inicio', 'mov-fim')}`);
+    if (!lista) return;
 
-    $('tb-vendas-body').innerHTML = vendas.length === 0
-        ? '<tr><td colspan="5" class="vazio">Nenhuma venda no período.</td></tr>'
-        : vendas.map(v => `
+    $('tb-mov-body').innerHTML = lista.length === 0
+        ? '<tr><td colspan="5" class="vazio">Nenhuma movimentação no período.</td></tr>'
+        : lista.map(m => {
+            const entrada = m.tipo === 'Entrada';
+            return `
             <tr>
-                <td>#${v.id}</td>
-                <td>${formatarDataHora(v.data_venda)}</td>
-                <td style="white-space:normal">${escapeHtml(v.descricao_itens || '-')}</td>
-                <td>${escapeHtml(v.forma_pagamento)}</td>
-                <td class="num"><strong>${formatarMoeda(v.total)}</strong></td>
-            </tr>`).join('');
+                <td><strong class="${entrada ? 'pos' : 'neg'}">${entrada ? '▲ Entrada' : '▼ Saída'}</strong></td>
+                <td>${formatarDataHora(m.data)}</td>
+                <td style="white-space:normal">${escapeHtml(m.descricao || '-')}</td>
+                <td>${escapeHtml(m.forma_pagamento)}</td>
+                <td class="num ${entrada ? 'pos' : 'neg'}"><strong>${entrada ? '' : '- '}${formatarMoeda(m.valor)}</strong></td>
+            </tr>`;
+        }).join('');
 
-    const soma = vendas.reduce((s, v) => s + v.total, 0);
-    $('tf-vendas').innerHTML = vendas.length
-        ? `<tr><td colspan="4">${vendas.length} venda(s) no período</td><td class="num">${formatarMoeda(soma)}</td></tr>`
+    const entradas = lista.filter(m => m.tipo === 'Entrada').reduce((s, m) => s + m.valor, 0);
+    const saidas = lista.filter(m => m.tipo !== 'Entrada').reduce((s, m) => s + m.valor, 0);
+    const saldo = entradas - saidas;
+    $('tf-mov').innerHTML = lista.length
+        ? `<tr><td colspan="4">${lista.length} movimentação(ões) · Entradas ${formatarMoeda(entradas)} · Saídas ${formatarMoeda(saidas)}</td><td class="num ${saldo < 0 ? 'neg' : ''}">${formatarMoeda(saldo)}</td></tr>`
         : '';
-}
-
-async function carregarTop() {
-    const tops = await apiRequest(`/relatorios/top-produtos${periodo('top-inicio', 'top-fim')}`);
-    if (!tops) return;
-    $('tb-top-produtos').innerHTML = tops.length === 0
-        ? '<tr><td colspan="4" class="vazio">Nenhum produto vendido no período.</td></tr>'
-        : tops.map(p => `
-            <tr>
-                <td>${escapeHtml(p.codigo)}</td>
-                <td><strong>${escapeHtml(p.nome)}</strong></td>
-                <td class="num">${p.total_vendido} un.</td>
-                <td class="num pos"><strong>${formatarMoeda(p.faturamento_total)}</strong></td>
-            </tr>`).join('');
 }
 
 /* ---------- Restauração de fábrica (gerente) ---------- */
@@ -143,10 +134,8 @@ document.addEventListener('DOMContentLoaded', () => {
     const agora = new Date();
     const hoje = dataISO();
     const inicioMes = dataISO(new Date(agora.getFullYear(), agora.getMonth(), 1));
-    ['vendas', 'top'].forEach(p => {
-        $(`${p}-inicio`).value = inicioMes;   // período padrão: mês atual
-        $(`${p}-fim`).value = hoje;
-    });
+    $('mov-inicio').value = inicioMes;   // período padrão: mês atual
+    $('mov-fim').value = hoje;
 
     $('select-mes-fluxo').innerHTML = MESES.map((m, i) => `<option value="${i + 1}">${m}</option>`).join('');
     $('select-mes-fluxo').value = agora.getMonth() + 1;
@@ -154,8 +143,7 @@ document.addEventListener('DOMContentLoaded', () => {
     document.querySelectorAll('.tab-btn').forEach(b => b.addEventListener('click', () => mostrarAba(b.dataset.aba)));
     $('select-mes-fluxo').addEventListener('change', carregarFluxo);
     $('select-ano-fluxo').addEventListener('change', carregarFluxo);
-    $('btn-filtrar-vendas').addEventListener('click', carregarVendas);
-    $('btn-filtrar-top').addEventListener('click', carregarTop);
+    $('btn-filtrar-mov').addEventListener('click', carregarMovimentacoes);
 
     if (Sessao.cargo() === 'GERENTE') {
         $('area-gerente').hidden = false;

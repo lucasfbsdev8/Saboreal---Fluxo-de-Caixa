@@ -1,8 +1,8 @@
 """Saldos acumulados da empresa: UMA única regra de cálculo, usada pela Tela Inicial
 (/api/caixa/status) e pelo relatório de Fluxo de Caixa (/api/relatorios/fluxo-caixa).
 
-  Saldo dinheiro (caixa) = saldo informado na implantação + vendas em dinheiro - saídas pagas em dinheiro
-  Saldo banco            = vendas por PIX/cartão - saídas pagas por PIX/cartão
+  Saldo dinheiro (caixa) = saldo inicial em caixa (implantação) + vendas em dinheiro - saídas pagas em dinheiro
+  Saldo banco            = saldo inicial em banco (implantação) + vendas por PIX/cartão - saídas pagas por PIX/cartão
   Saldo total            = saldo dinheiro + saldo banco
 
 Valores em centavos. Considera TODAS as vendas e saídas, de qualquer caixa (turno), e não só as do caixa aberto.
@@ -29,7 +29,8 @@ def saldos_acumulados(db, antes_de=None):
     ).fetchone()
 
     registro = implantacao(db)
-    saldo_inicial = registro['valor_inicial'] if registro else 0
-    dinheiro = saldo_inicial + linha['venda_dinheiro'] - linha['saida_dinheiro']
-    banco = linha['venda_banco'] - linha['saida_banco']
+    inicial_caixa = registro['saldo_caixa'] if registro else 0
+    inicial_banco = registro['saldo_banco'] if registro else 0
+    dinheiro = inicial_caixa + linha['venda_dinheiro'] - linha['saida_dinheiro']
+    banco = inicial_banco + linha['venda_banco'] - linha['saida_banco']
     return {'saldo_dinheiro': dinheiro, 'saldo_banco': banco, 'valor_atual_total': dinheiro + banco}

@@ -44,6 +44,12 @@ def init_db():
             f'Apague o arquivo {DB_PATH} e rode novamente (ele será recriado já com os produtos iniciais).'
         )
 
+        # Migração: a implantação antiga guardava um valor único (valor_inicial = dinheiro do caixa).
+    impl = [c[1] for c in conexao.execute('PRAGMA table_info(implantacao)')]
+    if impl and 'saldo_caixa' not in impl:
+        conexao.execute('ALTER TABLE implantacao RENAME COLUMN valor_inicial TO saldo_caixa')
+        conexao.execute('ALTER TABLE implantacao ADD COLUMN saldo_banco INTEGER NOT NULL DEFAULT 0')
+        
     with open(SCHEMA_PATH, 'r', encoding='utf-8') as arquivo:
         conexao.executescript(arquivo.read())
 

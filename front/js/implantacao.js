@@ -12,21 +12,22 @@ async function iniciar() {
         return;
     }
 
-    $('valor-inicial').focus();
+    $('saldo-caixa').focus();
     $('form-implantacao').addEventListener('submit', async e => {
         e.preventDefault();
-        const valor = lerCentavos($('valor-inicial'));
+        const saldoCaixa = lerCentavos($('saldo-caixa'));
+        const saldoBanco = lerCentavos($('saldo-banco'));
         const confirmado = await confirmar(
-            `Registrar ${formatarMoeda(valor)} como o dinheiro que havia no caixa?\nEsse valor não poderá ser alterado depois.`,
+            `Registrar estes saldos iniciais?\n\nEm caixa (dinheiro): ${formatarMoeda(saldoCaixa)}\nEm banco (PIX/conta): ${formatarMoeda(saldoBanco)}\n\nEsses valores não poderão ser alterados depois.`,
             { textoOk: 'Confirmar' }
         );
         if (!confirmado) return;
 
         const botao = e.target.querySelector('button[type="submit"]');
         botao.disabled = true;
-        const r = await apiRequest('/implantacao', 'POST', { valor_inicial: valor, observacao: $('obs-implantacao').value });
+        const r = await apiRequest('/implantacao', 'POST', { saldo_caixa: saldoCaixa, saldo_banco: saldoBanco, observacao: $('obs-implantacao').value });
         if (r?.sucesso) {
-            toast('Saldo inicial registrado! Bom trabalho.', 'sucesso');
+            toast('Saldos iniciais registrados! Bom trabalho.', 'sucesso');
             setTimeout(() => { location.href = 'inicio.html'; }, 900);
         } else {
             botao.disabled = false;

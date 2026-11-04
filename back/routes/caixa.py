@@ -36,8 +36,7 @@ def _ultimo_fechamento(db):
     if linha and linha['valor_fechamento'] is not None:
         return linha['valor_fechamento']
     registro = implantacao(db)
-    return registro['valor_inicial'] if registro else 0
-
+    return registro['saldo_caixa'] if registro else 0
 
 @bp.get('/caixa/status')
 @exige_login
@@ -55,22 +54,17 @@ def status():
 @bp.post('/caixa/abrir')
 @exige_login
 def abrir():
-    dados = dados_json()
     db = get_db()
     if caixa_aberto(db):
         raise ErroNegocio('Já existe um caixa aberto.', 409)
 
-    reforco = inteiro(dados.get('reforco'), 0)
-    if reforco < 0:
-        raise ErroNegocio('Reforço inválido.')
-
+    # Abre confirmando o dinheiro que já existe no caixa: último fechamento (ou saldo da implantação).
     db.execute(
-        'INSERT INTO caixa (operador, valor_abertura, observacao) VALUES (?, ?, ?)',
-        (g.usuario['usuario'], _ultimo_fechamento(db) + reforco, str(dados.get('observacao') or '').strip()),
+        'INSERT INTO caixa (operador, valor_abertura) VALUES (?, ?)',
+        (g.usuario['usuario'], _ultimo_fechamento(db)),
     )
     db.commit()
     return jsonify({'sucesso': True, 'mensagem': 'Caixa aberto com sucesso!'})
-
 
 @bp.post('/caixa/fechar')
 @exige_login

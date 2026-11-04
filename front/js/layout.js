@@ -67,8 +67,7 @@ async function sair() {
                         </li>
                         <li class="${emRelatorios ? 'active' : ''}">
                             <a href="relatorios.html">📊 Relatórios</a>
-                            ${emRelatorios ? `<ul class="sub-menu">${subRel('fluxo', 'Fluxo de caixa')}${subRel('vendas', 'Histórico de vendas')}${subRel('produtos', 'Mais vendidos')}</ul>` : ''}
-                        </li>
+                            ${emRelatorios ? `<ul class="sub-menu">${subRel('fluxo', 'Fluxo de caixa')}${subRel('movimentacoes', 'Histórico de movimentações')}</ul>` : ''}                        </li>
                     </ul>
                 </div>
                 <ul class="menu"><li><a href="#" id="btn-sair">➔ Sair (${escapeHtml(Sessao.usuario())})</a></li></ul>
