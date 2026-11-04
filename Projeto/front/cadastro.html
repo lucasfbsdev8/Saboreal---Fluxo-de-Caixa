@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cadastro de produtos - SABOREAL</title>
+    <link rel="icon" href="imagens/icone.png">
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<div class="app-container">
+    <div id="sidebar-container"></div>
+    <main class="main-content">
+        <header class="top-bar"><h2>Cadastro de produtos</h2></header>
+        <div class="page-body cadastro-layout">
+            <section class="card-panel">
+                <h3 id="form-title">Novo produto</h3>
+                <form id="form-produto">
+                    <div class="form-group">
+                        <label for="prod-codigo">Código</label>
+                        <input type="text" id="prod-codigo" class="form-control" readonly>
+                    </div>
+                    <div class="form-group">
+                        <label for="prod-nome">Nome</label>
+                        <input type="text" id="prod-nome" class="form-control" maxlength="80" placeholder="Ex.: Biscoito amanteigado 200g" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="prod-categoria">Categoria</label>
+                        <select id="prod-categoria" class="form-control" required></select>
+                    </div>
+                    <div class="form-group">
+                        <label for="prod-preco">Preço de venda</label>
+                        <input type="text" id="prod-preco" class="form-control" data-moeda inputmode="numeric" autocomplete="off" required>
+                    </div>
+                    <button type="submit" id="btn-salvar-prod" class="btn-success btn-block">Cadastrar produto</button>
+                    <button type="button" id="btn-cancelar-edicao" class="btn-secondary btn-block" hidden>Cancelar edição</button>
+                </form>
+            </section>
+
+            <section class="card-panel">
+                <h3>Produtos cadastrados</h3>
+                <div class="table-wrap">
+                    <table class="table-custom">
+                        <thead><tr><th>Cód.</th><th>Nome</th><th>Categoria</th><th class="num">Preço</th><th class="num">Estoque</th><th>Ações</th></tr></thead>
+                        <tbody id="tb-produtos-body"></tbody>
+                    </table>
+                </div>
+            </section>
+        </div>
+    </main>
+</div>
+<script src="js/utils.js"></script>
+<script src="js/api.js"></script>
+<script src="js/layout.js"></script>
+<script src="js/cadastro.js"></script>
+</body>
+</html>

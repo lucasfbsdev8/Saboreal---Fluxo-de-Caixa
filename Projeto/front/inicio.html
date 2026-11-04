@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Início - SABOREAL</title>
+    <link rel="icon" href="imagens/icone.png">
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<div class="app-container">
+    <div id="sidebar-container"></div>
+    <main class="main-content">
+        <header class="top-bar">
+            <div class="header-logo-title">
+                <img src="imagens/logo.png" alt="">
+                <h2>Painel de controle</h2>
+            </div>
+        </header>
+        <div class="page-body">
+            <section class="status-summary-card">
+                <div class="status-summary-header">
+                    <div>
+                        <h3>Status do caixa</h3>
+                        <small id="lbl-status-detalhe"></small>
+                    </div>
+                    <span id="lbl-status-badge" class="badge-status bg-fechado">Carregando…</span>
+                </div>
+                <div class="metrics-grid" id="container-metricas"></div>
+            </section>
+            <section class="actions-grid" id="container-botoes-acao"></section>
+        </div>
+    </main>
+</div>
+<script src="js/utils.js"></script>
+<script src="js/api.js"></script>
+<script src="js/layout.js"></script>
+<script src="js/inicio.js"></script>
+</body>
+</html>
