@@ -44,7 +44,7 @@ h3 { color: var(--marrom-escuro); margin-bottom: 12px; }
 .menu { list-style: none; margin-top: 15px; }
 .menu li a, .menu-grupo { display: flex; align-items: center; gap: 12px; padding: 12px 25px; color: #D7CCC8; text-decoration: none; font-weight: 500; transition: background-color .2s, color .2s; }
 .menu li.active > a, .menu li.active > .menu-grupo { background: var(--vermelho-escuro); color: #FFF; }
-.menu li a:hover { background: var(--bege); color: #FFF; }
+.menu li a:hover { background: var(--marrom); color: #FFF; }
 .menu-grupo { cursor: default; }
 .sub-menu { list-style: none; background: var(--marrom-sidebar-sub); }
 .sub-menu li a { padding-left: 45px; font-size: 0.85rem; }

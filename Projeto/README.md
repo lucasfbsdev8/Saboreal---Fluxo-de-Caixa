@@ -7,7 +7,7 @@ Back-end em **Flask + SQLite**; front-end em **HTML/CSS/JS puro**, servido pelo 
 
 ```bash
 python -m venv .venv
-.venv\Scripts\activate          # Windows   (Linux/Mac: source .venv/bin/activate)
+source .venv/bin/activate          # Windows   (Linux/Mac: source .venv/bin/activate)
 pip install -r requirements.txt
 python back/app.py
 ```
