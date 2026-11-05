@@ -95,7 +95,6 @@ button:disabled { opacity: .55; cursor: not-allowed; }
 .banner-container { flex: 1.6; background: url('../imagens/fundo.png') no-repeat center / cover; display: flex; flex-direction: column; justify-content: space-between; padding: 50px 60px; }
 .brand-header-left { display: flex; justify-content: flex-end; padding-right: 40px; }
 .logo-escrita-img { max-width: 320px; height: auto; }
-.system-title-bottom { font-size: 2.8rem; font-weight: 800; color: var(--marrom-texto); margin: 0 0 20px 20px; }
 .form-side { flex: 1; background: #534338; display: flex; justify-content: center; align-items: center; padding: 40px; }
 .form-content { width: 100%; max-width: 320px; display: flex; flex-direction: column; align-items: center; }
 .chef-hat-icon { width: 110px; margin-bottom: 30px; }
@@ -137,10 +136,9 @@ button:disabled { opacity: .55; cursor: not-allowed; }
 .pdv { display: grid; grid-template-columns: 1fr 340px; gap: 20px; align-items: start; }
 .pdv-carrinho { position: sticky; top: 0; margin-bottom: 0; }
 .products-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 14px; margin-top: 14px; }
-.product-card { background: #FFF; border: 2px solid transparent; border-radius: 10px; padding: 12px; text-align: center; cursor: pointer; box-shadow: 0 2px 5px rgba(0,0,0,.06); }
+.product-card { display: flex; flex-direction: column; justify-content: center; background: #FFF; border: 2px solid transparent; border-radius: 10px; padding: 12px; text-align: center; cursor: pointer; box-shadow: 0 2px 5px rgba(0,0,0,.06); }
 .product-card:hover:not(:disabled) { border-color: var(--marrom); }
 .product-card:disabled { opacity: .55; cursor: not-allowed; }
-.product-card img { width: 52px; height: 52px; object-fit: contain; }
 .product-card h4 { font-size: .95rem; margin: 6px 0 4px; color: var(--marrom-escuro); }
 .product-card .price { font-weight: bold; color: var(--verde); }
 .stock-tag { font-size: .75rem; color: var(--marrom-texto); margin-top: 4px; }

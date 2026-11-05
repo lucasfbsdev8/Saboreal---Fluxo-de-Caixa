@@ -29,7 +29,6 @@ function renderizarGrid() {
         const esgotado = p.estoque <= 0;
         return `
             <button type="button" class="product-card" data-codigo="${escapeHtml(p.codigo)}" ${esgotado ? 'disabled' : ''}>
-                <img src="imagens/logo.png" alt="">
                 <h4>${escapeHtml(p.nome)}</h4>
                 <div class="price">${formatarMoeda(p.preco_venda)}</div>
                 <div class="stock-tag ${esgotado ? 'esgotado' : ''}">${esgotado ? 'Esgotado' : `Estoque: ${p.estoque} un.`}</div>

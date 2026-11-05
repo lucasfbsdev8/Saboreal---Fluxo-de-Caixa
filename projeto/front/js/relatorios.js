@@ -19,6 +19,20 @@ function mostrarAba(nome) {
         b.classList.toggle('active', ativa);
         b.setAttribute('aria-selected', ativa);
     });
+
+    // Sincroniza a URL sem recarregar a página
+    history.replaceState(null, '', `relatorios.html?aba=${nome}`);
+
+    // Atualiza o item ativo na sidebar em tempo real
+    const sidebarSubMenu = document.querySelectorAll('.sidebar .sub-menu li');
+    sidebarSubMenu.forEach(li => {
+        const link = li.querySelector('a');
+        if (link && link.href.includes('relatorios.html')) {
+            const ehSubAba = link.href.includes(`aba=${nome}`);
+            li.classList.toggle('active', ehSubAba);
+        }
+    });
+
     if (!carregadas.has(nome)) {
         carregadas.add(nome);
         ({ fluxo: carregarFluxo, movimentacoes: carregarMovimentacoes })[nome]();
