@@ -7,7 +7,7 @@ Back-end em **Flask + SQLite**; front-end em **HTML/CSS/JS puro**, servido pelo 
 
 ```bash
 python -m venv .venv
-source .venv/bin/activate          # Windows   (Linux/Mac: source .venv/bin/activate)
+.venv\Scripts\activate          # Windows   (Linux/Mac: source .venv/bin/activate)
 pip install -r requirements.txt
 python back/app.py
 ```
@@ -15,22 +15,31 @@ python back/app.py
 Abra **http://127.0.0.1:5000** no navegador.
 
 - Usuário inicial: `admin` / senha `1234` (**troque antes de entregar ao cliente**, veja abaixo).
-- O banco (`banco/saboreal.db`) e a chave de sessão (`banco/.secret_key`) são criados sozinhos na primeira execução, **já com os 39 produtos iniciais** e o estoque de partida. Os dados **não são apagados** ao reiniciar o servidor.
-- Se você tinha um `saboreal.db` de uma versão anterior, apague-o antes (o formato mudou). O sistema avisa se encontrar um antigo.
+- O banco (`banco/saboreal.db`) e a chave de sessão (`banco/.secret_key`) são criados sozinhos na primeira execução, **já com os 39 produtos iniciais** e o estoque de partida. Os dados **não são apagados** ao reiniciar o servidor. Esses dois arquivos não vão para o GitHub.
+- Se o sistema avisar que o banco está em **formato antigo**, apague o `banco/saboreal.db` e rode de novo. A implantação do formato anterior (um único saldo) é atualizada automaticamente.
 
-### Primeiro acesso (saldo inicial do caixa)
+### Primeiro acesso (saldos iniciais)
 
-No primeiro login do gerente, o sistema abre a tela `implantacao.html` e pede o dinheiro que havia no caixa antes de passar a usar o sistema. Esse valor é registrado **uma única vez** (não pode ser alterado) e passa a ser o saldo anterior do primeiro caixa e o saldo inicial em dinheiro do fluxo de caixa. Enquanto não for informado, as demais telas ficam bloqueadas.
+No primeiro login do gerente, o sistema abre a tela `implantacao.html` e pede os saldos que a empresa tinha antes de passar a usar o sistema:
 
-### Entregar ao cliente (modo limpo)
+- **Saldo Inicial em Caixa (R$):** o dinheiro em espécie na gaveta;
+- **Saldo Inicial em Banco (R$):** o saldo na conta (PIX/cartões).
 
-Depois de testar, restaure o sistema para uso real. Isso apaga vendas, saídas, caixas, produtos e o saldo inicial informado, e recria os 39 produtos iniciais com o estoque de partida (os usuários são mantidos). No próximo login, o gerente informa o saldo inicial real do caixa. Duas formas:
+Os dois valores são registrados **uma única vez** (não podem ser alterados) e são o ponto de partida do sistema: o saldo em caixa é o dinheiro com que o primeiro caixa abre, e ambos entram no fluxo de caixa. Enquanto não forem informados, as demais telas ficam bloqueadas, e só o gerente consegue registrá-los.
+
+### Reiniciar o banco / entregar ao cliente (modo limpo)
+
+Depois de testar, deixe o sistema pronto para uso real. A restauração apaga vendas, saídas, caixas, produtos e os saldos iniciais informados, e recria os 39 produtos iniciais com o estoque de partida (os usuários e a senha são mantidos). No próximo login, o gerente informa os saldos iniciais reais. Três formas:
 
 - **Pela tela:** entre como gerente, vá em **Relatórios** e use **Restaurar sistema para uso real** (pede a senha).
 - **Pelo terminal:** `python back/app.py --restaurar-fabrica` (pede para digitar `RESTAURAR`).
+- **Apagando o arquivo do banco** (zera também os usuários; a senha do admin volta a `1234`): pare o servidor, apague `banco/saboreal.db` (`Remove-Item banco\saboreal.db` no PowerShell; `rm banco/saboreal.db` no Linux/Mac) e inicie de novo. O banco é recriado do zero.
+
+Não há como desfazer: se quiser guardar uma cópia dos dados, copie o arquivo do banco antes.
 
 Estoque de partida (por produto): Biscoitos 50 · Doces 20 · Bolos 8 · Salgados 25 · Bebidas 15.
 A lista de produtos e preços está em `back/seed.py`.
+
 ### Trocar a senha do admin
 
 ```bash
@@ -53,24 +62,25 @@ python -c "from werkzeug.security import generate_password_hash as g; import sql
 Saboreal/
 ├── back/
 │   ├── app.py              # cria o app, registra as rotas, serve o front
-│   ├── db.py               # conexão por requisição, criação do banco
+│   ├── db.py               # conexão por requisição, criação e migração do banco
 │   ├── auth.py             # token de sessão e proteção das rotas
 │   ├── utils.py            # constantes, validações e erros padronizados
-│   ├── saldos.py           # regras e cálculos de saldos do caixa
+│   ├── saldos.py           # regra única dos saldos (tela inicial e relatório)
 │   ├── seed.py             # os 39 produtos iniciais e a restauração de fábrica
-│   └── routes/             # autenticacao, produtos, caixa, vendas, relatorios, admin, implantacao
+│   └── routes/             # autenticacao, implantacao, produtos, caixa, vendas, relatorios, admin
 ├── banco/
 │   └── schema.sql          # tabelas (valores em centavos)
 └── front/
-    ├── *.html              # login, inicio, caixa, vendas, cadastro, estoque, relatorios, implantacao
+    ├── *.html              # login, implantacao, inicio, caixa, vendas, cadastro, estoque, relatorios
     ├── css/style.css       # único CSS
-    ├── js/                 # utils, api, layout (compartilhados) + um .js por página (implantacao.js, etc.)
+    ├── js/                 # utils, api, layout (compartilhados) + um .js por página
     └── imagens/
 ```
 
 ## Regras importantes
 
 - **Caixa aberto para operar:** nova venda, nova saída, estoque e cadastro/edição/exclusão de produtos só funcionam com o caixa aberto. Isso é validado no **servidor** (e a interface bloqueia o menu).
+- **Abertura de caixa direta:** o caixa abre com um clique, com o dinheiro que já existe: o valor contado no último fechamento (ou, na primeira vez, o saldo em caixa informado no primeiro acesso). Não há reforço nem observação na abertura.
 - **Um caixa por vez** (garantido pelo próprio banco). No fechamento, o sistema compara o valor contado com o esperado (abertura + vendas em dinheiro − saídas em dinheiro) e registra a **quebra** ou a **sobra**.
 - **5 categorias oficiais:** Biscoitos, Doces, Bolos, Salgados e Bebidas (validadas no servidor e no banco).
 - **Cadastro simples:** código (sequencial automático), nome, categoria e preço de venda. Não há custo por item.
@@ -81,6 +91,17 @@ Saboreal/
 
 ## Relatórios e saldos
 
-- **Fluxo de caixa:** escolha mês e ano; uma coluna por dia. Entradas por forma de pagamento, saídas por categoria e saldo operacional (entradas − saídas). Os saldos são separados em **caixa (dinheiro)** e **banco (PIX e cartões)**, e o saldo final é a soma dos dois. O saldo inicial é o valor informado no primeiro acesso mais o que já entrou e saiu antes; cada dia começa com o saldo final do dia anterior. Dias futuros ou anteriores à implantação aparecem como "-". Reforço de caixa e quebra/sobra não entram no fluxo.
-- **Tela inicial e relatório usam a mesma regra** (`back/saldos.py`): saldo em dinheiro = saldo inicial + vendas em dinheiro − saídas em dinheiro; saldo no banco = vendas por PIX/cartão − saídas por PIX/cartão; total = soma dos dois.
-- **Histórico de vendas** e **Mais vendidos**, com filtro por período.
+- **Fluxo de caixa:** escolha mês e ano; uma coluna por dia. Entradas por forma de pagamento (dinheiro, PIX, crédito, débito), saídas por categoria e saldo operacional (entradas − saídas). Os saldos são separados em **caixa (dinheiro)** e **banco (PIX e cartões)**, e o saldo final é a soma dos dois. O saldo inicial é o informado no primeiro acesso mais o que já entrou e saiu antes; cada dia começa com o saldo final do dia anterior. Dias futuros ou anteriores à implantação aparecem como "-". Quebra e sobra de caixa não entram no fluxo.
+- **Histórico de movimentações:** entradas (vendas) e saídas na mesma lista, da mais recente para a mais antiga, com tipo, data e hora, descrição (itens da venda ou categoria da saída), forma de pagamento e valor. Tem filtro por período e totais no rodapé.
+- **Tela inicial e relatório usam a mesma regra de saldos** (`back/saldos.py`):
+  - saldo em dinheiro = saldo inicial em caixa + vendas em dinheiro − saídas pagas em dinheiro;
+  - saldo no banco = saldo inicial em banco + vendas por PIX/cartão − saídas pagas por PIX/cartão;
+  - saldo total = saldo em dinheiro + saldo no banco.
+
+## Problemas comuns
+
+- **PowerShell: "a execução de scripts foi desabilitada neste sistema"** ao ativar o `.venv`: rode `Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser` e ative de novo.
+- **"Banco em formato antigo detectado":** apague o `banco/saboreal.db` (o sistema o recria).
+- **Porta 5000 em uso:** use outra porta. No PowerShell: `$env:SABOREAL_PORT=5001; python back/app.py`.
+- **Não consegue apagar o `saboreal.db` ("em uso"):** pare o servidor antes.
+- **Depois de atualizar o código, a tela não muda ou dá erro:** reinicie o servidor e recarregue a página com `Ctrl+F5`.
