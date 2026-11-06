@@ -13,7 +13,11 @@ const ROTULO_ENTRADA = {
 
 function mostrarAba(nome) {
     if (!ABAS.includes(nome)) nome = 'fluxo';
-    ABAS.forEach(a => { $(`tab-${a}`).hidden = a !== nome; });
+    ABAS.forEach(a => { 
+        const el = $(`tab-${a}`);
+        if (el) el.hidden = a !== nome; 
+    });
+
     document.querySelectorAll('.tab-btn').forEach(b => {
         const ativa = b.dataset.aba === nome;
         b.classList.toggle('active', ativa);
@@ -23,11 +27,11 @@ function mostrarAba(nome) {
     // Sincroniza a URL sem recarregar a página
     history.replaceState(null, '', `relatorios.html?aba=${nome}`);
 
-    // Atualiza o item ativo na sidebar em tempo real
-    const sidebarSubMenu = document.querySelectorAll('.sidebar .sub-menu li');
-    sidebarSubMenu.forEach(li => {
+    // Sincroniza APENAS os sub-itens do relatório na sidebar
+    const subItensRelatorio = document.querySelectorAll('.sidebar .item-sub-relatorio');
+    subItensRelatorio.forEach(li => {
         const link = li.querySelector('a');
-        if (link && link.href.includes('relatorios.html')) {
+        if (link) {
             const ehSubAba = link.href.includes(`aba=${nome}`);
             li.classList.toggle('active', ehSubAba);
         }

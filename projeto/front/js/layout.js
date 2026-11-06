@@ -41,9 +41,11 @@ async function sair() {
             </li>`;
         const rotuloCaixa = `${icone('caixa')} ${aberto === true ? 'Fechar caixa' : aberto === false ? 'Abrir caixa' : 'Caixa'}`;
         const hrefCaixa = aberto === true ? 'caixa.html?aba=fechar' : aberto === false ? 'caixa.html?aba=abrir' : 'caixa.html';
-        const emMovimentacoes = ['vendas.html', 'cadastro.html', 'estoque.html'].includes(pagina) || (pagina === 'caixa.html' && aba === 'saida');
+        
+        // Garante estritamente que Movimentações só fica ativo nas telas de movimentação
+        const emMovimentacoes = (pagina === 'vendas.html' || pagina === 'cadastro.html' || pagina === 'estoque.html') || (pagina === 'caixa.html' && aba === 'saida');
         const emRelatorios = pagina === 'relatorios.html';
-        const subRel = (id, rotulo) => `<li class="${(aba || 'fluxo') === id ? 'active' : ''}"><a href="relatorios.html?aba=${id}">${rotulo}</a></li>`;
+        const subRel = (id, rotulo) => `<li class="item-sub-relatorio ${(aba || 'fluxo') === id ? 'active' : ''}"><a href="relatorios.html?aba=${id}">${rotulo}</a></li>`;
 
         container.innerHTML = `
             <nav class="sidebar" aria-label="Menu principal">
@@ -67,7 +69,8 @@ async function sair() {
                         </li>
                         <li class="${emRelatorios ? 'active' : ''}">
                             <a href="relatorios.html">${icone('relatorios')} Relatórios</a>
-                            ${emRelatorios ? `<ul class="sub-menu">${subRel('fluxo', 'Fluxo de caixa')}${subRel('movimentacoes', 'Histórico de movimentações')}</ul>` : ''}                        </li>
+                            ${emRelatorios ? `<ul class="sub-menu">${subRel('fluxo', 'Fluxo de caixa')}${subRel('movimentacoes', 'Histórico de movimentações')}</ul>` : ''}
+                        </li>
                     </ul>
                 </div>
                 <ul class="menu"><li><a href="#" id="btn-sair">${icone('sair')} Sair (${escapeHtml(Sessao.usuario())})</a></li></ul>
