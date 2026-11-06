@@ -1,6 +1,6 @@
 const $ = id => document.getElementById(id);
 const ABAS = ['fluxo', 'movimentacoes'];
-const carregadas = new Set();   // cada aba só busca dados na primeira vez que é aberta
+const carregadas = new Set(); 
 
 const MESES = ['Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho', 'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'];
 const MESES_CURTOS = ['jan', 'fev', 'mar', 'abr', 'mai', 'jun', 'jul', 'ago', 'set', 'out', 'nov', 'dez'];
@@ -24,10 +24,8 @@ function mostrarAba(nome) {
         b.setAttribute('aria-selected', ativa);
     });
 
-    // Sincroniza a URL sem recarregar a página
     history.replaceState(null, '', `relatorios.html?aba=${nome}`);
 
-    // Sincroniza APENAS os sub-itens do relatório na sidebar
     const subItensRelatorio = document.querySelectorAll('.sidebar .item-sub-relatorio');
     subItensRelatorio.forEach(li => {
         const link = li.querySelector('a');
@@ -39,46 +37,56 @@ function mostrarAba(nome) {
 
     if (!carregadas.has(nome)) {
         carregadas.add(nome);
-        ({ fluxo: carregarFluxo, movimentacoes: carregarMovimentacoes })[nome]();
+        if (nome === 'fluxo') carregarFluxo();
+        if (nome === 'movimentacoes') carregarMovimentacoes();
     }
 }
 
 /* ---------- Fluxo de caixa diário ---------- */
 async function carregarFluxo() {
-    const mes = $('select-mes-fluxo').value;
-    const ano = $('select-ano-fluxo').value;
+    const mes = $('select-mes-fluxo')?.value || '';
+    const ano = $('select-ano-fluxo')?.value || '';
     const res = await apiRequest(`/relatorios/fluxo-caixa${mes && ano ? `?mes=${mes}&ano=${ano}` : ''}`);
     if (!res) return;
 
-    $('select-ano-fluxo').innerHTML = res.anos.map(a => `<option value="${a}" ${a === res.ano ? 'selected' : ''}>${a}</option>`).join('');
-    $('select-mes-fluxo').value = res.mes;
+    if ($('select-ano-fluxo')) {
+        $('select-ano-fluxo').innerHTML = res.anos.map(a => `<option value="${a}" ${a === res.ano ? 'selected' : ''}>${a}</option>`).join('');
+    }
+    if ($('select-mes-fluxo')) {
+        $('select-mes-fluxo').value = res.mes;
+    }
     renderizarFluxo(res);
 }
 
 function renderizarFluxo(res) {
-    const colunas = [...res.dias, res.resumo];   // última coluna = total do mês
+    const totalDias = res.dias.length;
 
     $('th-fluxo').innerHTML =
         '<tr><th class="sticky-col">FLUXO DE CAIXA</th>' +
         res.dias.map(d => `<th class="num">${d.dia}-${MESES_CURTOS[res.mes - 1]}</th>`).join('') +
-        '<th class="num">Total do mês</th></tr>';
+        '<th class="num sticky-col-right">Total do mês</th></tr>';
 
-    // extrair(coluna) -> valor em centavos; traco: mostra "-" quando for zero; sinal: negativo em vermelho
     const linha = (rotulo, extrair, { classe = '', traco = false, sinal = false } = {}) => {
-        const celulas = colunas.map(c => {
-            const v = extrair(c);
-            if (c.sem_dados || v === null || v === undefined) return '<td class="num futuro">-</td>';   // dia que ainda não chegou
+        const celulasDias = res.dias.map(d => {
+            const v = extrair(d);
+            if (d.sem_dados || v === null || v === undefined) return '<td class="num futuro">-</td>';
             const texto = traco && v === 0 ? '-' : formatarMoeda(v);
             return `<td class="num ${sinal && v < 0 ? 'neg' : ''}">${texto}</td>`;
         }).join('');
-        return `<tr class="${classe}"><td class="sticky-col">${escapeHtml(rotulo)}</td>${celulas}</tr>`;
+
+        const vResumo = extrair(res.resumo);
+        const textoResumo = (res.resumo.sem_dados || vResumo === null || vResumo === undefined) 
+            ? '-' 
+            : (traco && vResumo === 0 ? '-' : formatarMoeda(vResumo));
+        
+        const celulaTotal = `<td class="num ${sinal && vResumo < 0 ? 'neg' : ''} sticky-col-right">${textoResumo}</td>`;
+
+        return `<tr class="${classe}"><td class="sticky-col">${escapeHtml(rotulo)}</td>${celulasDias}${celulaTotal}</tr>`;
     };
 
-    // Faixa de título que separa os blocos da tabela.
     const faixa = titulo =>
-        `<tr class="linha-faixa"><td class="sticky-col">${escapeHtml(titulo)}</td><td colspan="${colunas.length}"></td></tr>`;
+        `<tr class="linha-faixa"><td class="sticky-col">${escapeHtml(titulo)}</td><td colspan="${totalDias}"></td><td class="sticky-col-right"></td></tr>`;
 
-    // Bloco de saldo: saldo inicial, movimento e saldo final de uma das contas ('caixa' ou 'banco').
     const blocoSaldo = (titulo, conta, rotuloEntrada, rotuloSaida, rotuloFinal) => [
         faixa(titulo),
         linha('Saldo inicial', c => c[`${conta}_saldo_inicial`], { classe: 'linha-sub', sinal: true }),
@@ -88,24 +96,23 @@ function renderizarFluxo(res) {
     ];
 
     $('tb-fluxo-body').innerHTML = [
-        // 1) Destaque principal: saldo inicial, movimento do dia e saldo atual (caixa + banco)
         linha('SALDO INICIAL (caixa + banco)', c => c.saldo_inicial, { classe: 'linha-total', sinal: true }),
         linha('SALDO OPERACIONAL', c => c.saldo_operacional, { classe: 'linha-total', sinal: true }),
         linha('SALDO FINAL (caixa + banco)', c => c.saldo_final, { classe: 'linha-saldo-final', sinal: true }),
-        // 2) Entradas e saídas do dia
         linha('TOTAL DE ENTRADAS', c => c.total_entradas, { classe: 'linha-total linha-separador' }),
         ...res.formas.map(f => linha(ROTULO_ENTRADA[f] || f, c => c.entradas[f], { classe: 'linha-sub', traco: true })),
         linha('TOTAL DE SAÍDAS', c => c.total_saidas, { classe: 'linha-total linha-separador' }),
         ...res.categorias.map(cat => linha(cat, c => c.saidas[cat], { classe: 'linha-sub', traco: true })),
-        // 3) Detalhe por conta: caixa (dinheiro) e banco (PIX e cartões)
         ...blocoSaldo('EM CAIXA (DINHEIRO)', 'caixa', '(+) Vendas em dinheiro', '(−) Saídas pagas em dinheiro', 'Saldo final em caixa'),
         ...blocoSaldo('NO BANCO (PIX E CARTÕES)', 'banco', '(+) Vendas por PIX e cartões', '(−) Saídas pagas por PIX e cartão', 'Saldo final no banco'),
-    ].join('');}
-/* ---------- Histórico de movimentações (entradas e saídas) ---------- */
+    ].join('');
+}
+
+/* ---------- Histórico de movimentações ---------- */
 function periodo(idInicio, idFim) {
     const params = new URLSearchParams();
-    if ($(idInicio).value) params.set('inicio', $(idInicio).value);
-    if ($(idFim).value) params.set('fim', $(idFim).value);
+    if ($(idInicio)?.value) params.set('inicio', $(idInicio).value);
+    if ($(idFim)?.value) params.set('fim', $(idFim).value);
     const texto = params.toString();
     return texto ? `?${texto}` : '';
 }
@@ -136,7 +143,7 @@ async function carregarMovimentacoes() {
         : '';
 }
 
-/* ---------- Restauração de fábrica (gerente) ---------- */
+/* ---------- Restauração de fábrica ---------- */
 async function restaurarSistema() {
     const senha = await pedirSenha(
         'Isso apaga TODAS as vendas, saídas, caixas e produtos, e recria os 39 produtos iniciais com o estoque de partida.\nDigite sua senha para confirmar.',
@@ -154,20 +161,30 @@ document.addEventListener('DOMContentLoaded', () => {
     const agora = new Date();
     const hoje = dataISO();
     const inicioMes = dataISO(new Date(agora.getFullYear(), agora.getMonth(), 1));
-    $('mov-inicio').value = inicioMes;   // período padrão: mês atual
-    $('mov-fim').value = hoje;
+    
+    if ($('mov-inicio')) $('mov-inicio').value = inicioMes;
+    if ($('mov-fim')) $('mov-fim').value = hoje;
 
-    $('select-mes-fluxo').innerHTML = MESES.map((m, i) => `<option value="${i + 1}">${m}</option>`).join('');
-    $('select-mes-fluxo').value = agora.getMonth() + 1;
+    if ($('select-mes-fluxo')) {
+        $('select-mes-fluxo').innerHTML = MESES.map((m, i) => `<option value="${i + 1}">${m}</option>`).join('');
+        $('select-mes-fluxo').value = agora.getMonth() + 1;
+        $('select-mes-fluxo').addEventListener('change', carregarFluxo);
+    }
+
+    if ($('select-ano-fluxo')) {
+        $('select-ano-fluxo').addEventListener('change', carregarFluxo);
+    }
 
     document.querySelectorAll('.tab-btn').forEach(b => b.addEventListener('click', () => mostrarAba(b.dataset.aba)));
-    $('select-mes-fluxo').addEventListener('change', carregarFluxo);
-    $('select-ano-fluxo').addEventListener('change', carregarFluxo);
-    $('btn-filtrar-mov').addEventListener('click', carregarMovimentacoes);
-
-    if (Sessao.cargo() === 'GERENTE') {
-        $('area-gerente').hidden = false;
-        $('btn-restaurar').addEventListener('click', restaurarSistema);
+    
+    if ($('btn-filtrar-mov')) {
+        $('btn-filtrar-mov').addEventListener('click', carregarMovimentacoes);
     }
+
+    if (typeof Sessao !== 'undefined' && Sessao.cargo() === 'GERENTE') {
+        if ($('area-gerente')) $('area-gerente').hidden = false;
+        if ($('btn-restaurar')) $('btn-restaurar').addEventListener('click', restaurarSistema);
+    }
+    
     mostrarAba(new URLSearchParams(location.search).get('aba') || 'fluxo');
 });

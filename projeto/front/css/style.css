@@ -209,14 +209,39 @@ button:disabled { opacity: .55; cursor: not-allowed; }
 @media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
 
 /* ---------- 13. Filtro por categoria e tabela do fluxo de caixa ---------- */
-.chips { display: flex; flex-wrap: wrap; gap: 8px; margin: 12px 0; }
-.chip { border: 1px solid var(--marrom); background: #FFF; color: var(--marrom-escuro); padding: 6px 14px; border-radius: 20px; font-weight: 600; font-size: .9rem; cursor: pointer; }
-.chip:hover { background: #F5EFEC; }
-.chip.active { background: var(--marrom-escuro); border-color: var(--marrom-escuro); color: #FFF; }
-
 .tabela-fluxo th, .tabela-fluxo td { min-width: 96px; }
-.tabela-fluxo .sticky-col { position: sticky; left: 0; z-index: 1; min-width: 240px; text-align: left; background: #FFF; box-shadow: 2px 0 0 var(--borda); }
-.tabela-fluxo th.sticky-col { background: var(--marrom); }
+
+/* Coluna fixada na esquerda (Descrição/Categorias) */
+.tabela-fluxo .sticky-col { 
+    position: sticky; 
+    left: 0; 
+    z-index: 3; 
+    min-width: 240px; 
+    text-align: left; 
+    background: #FFF; 
+    box-shadow: 2px 0 0 var(--borda); 
+}
+.tabela-fluxo th.sticky-col { background: var(--marrom); color: #FFF; }
+
+/* Coluna fixada na direita (Total do mês) */
+.tabela-fluxo .sticky-col-right {
+    position: sticky;
+    right: 0;
+    z-index: 3;
+    background: #FFF;
+    box-shadow: -2px 0 0 var(--borda);
+}
+.tabela-fluxo th.sticky-col-right {
+    background: var(--marrom);
+    color: #FFF;
+}
+
+/* Garante as cores de fundo corretas nas células fixas à direita */
+.tabela-fluxo tr.linha-total td.sticky-col-right { background: #EFEBE9; }
+.tabela-fluxo tr.linha-subtotal td.sticky-col-right { background: #F5EFEC; }
+.tabela-fluxo tr.linha-saldo-final td.sticky-col-right { background: #FFF3B0; }
+.tabela-fluxo tr.linha-faixa td.sticky-col-right { background: var(--marrom); color: #FFF; }
+
 .tabela-fluxo tr.linha-total td { background: #EFEBE9; font-weight: bold; }
 .tabela-fluxo tr.linha-sub td:first-child { padding-left: 26px; font-weight: normal; }
 .tabela-fluxo tr.linha-sub td { color: #4E4E4E; }
