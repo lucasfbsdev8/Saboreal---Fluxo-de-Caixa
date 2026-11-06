@@ -8,8 +8,8 @@ Back-end em **Flask + SQLite**; front-end em **HTML/CSS/JS puro**, servido pelo 
 ```bash
 python -m venv .venv
 .venv\Scripts\activate          # Windows   (Linux/Mac: source .venv/bin/activate)
-pip install -r requirements.txt
-python back/app.py
+pip install -r projeto/requirements.txt
+python projeto/back/app.py
 ```
 
 Abra **http://127.0.0.1:5000** no navegador.

@@ -88,17 +88,19 @@ function renderizarFluxo(res) {
     ];
 
     $('tb-fluxo-body').innerHTML = [
-        linha('TOTAL DE ENTRADAS', c => c.total_entradas, { classe: 'linha-total' }),
+        // 1) Destaque principal: saldo inicial, movimento do dia e saldo atual (caixa + banco)
+        linha('SALDO INICIAL (caixa + banco)', c => c.saldo_inicial, { classe: 'linha-total', sinal: true }),
+        linha('SALDO OPERACIONAL', c => c.saldo_operacional, { classe: 'linha-total', sinal: true }),
+        linha('SALDO FINAL (caixa + banco)', c => c.saldo_final, { classe: 'linha-saldo-final', sinal: true }),
+        // 2) Entradas e saídas do dia
+        linha('TOTAL DE ENTRADAS', c => c.total_entradas, { classe: 'linha-total linha-separador' }),
         ...res.formas.map(f => linha(ROTULO_ENTRADA[f] || f, c => c.entradas[f], { classe: 'linha-sub', traco: true })),
         linha('TOTAL DE SAÍDAS', c => c.total_saidas, { classe: 'linha-total linha-separador' }),
         ...res.categorias.map(cat => linha(cat, c => c.saidas[cat], { classe: 'linha-sub', traco: true })),
-        linha('SALDO OPERACIONAL', c => c.saldo_operacional, { classe: 'linha-total linha-separador', sinal: true }),
+        // 3) Detalhe por conta: caixa (dinheiro) e banco (PIX e cartões)
         ...blocoSaldo('EM CAIXA (DINHEIRO)', 'caixa', '(+) Vendas em dinheiro', '(−) Saídas pagas em dinheiro', 'Saldo final em caixa'),
         ...blocoSaldo('NO BANCO (PIX E CARTÕES)', 'banco', '(+) Vendas por PIX e cartões', '(−) Saídas pagas por PIX e cartão', 'Saldo final no banco'),
-        linha('SALDO INICIAL (caixa + banco)', c => c.saldo_inicial, { classe: 'linha-total linha-separador', sinal: true }),
-        linha('SALDO FINAL (caixa + banco)', c => c.saldo_final, { classe: 'linha-saldo-final', sinal: true }),
     ].join('');}
-
 /* ---------- Histórico de movimentações (entradas e saídas) ---------- */
 function periodo(idInicio, idFim) {
     const params = new URLSearchParams();
