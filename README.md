@@ -15,7 +15,7 @@ python projeto/back/app.py
 Abra **http://127.0.0.1:5000** no navegador.
 
 - Usuário inicial: `admin` / senha `1234` (**troque antes de entregar ao cliente**, veja abaixo).
-- O banco (`banco/saboreal.db`) e a chave de sessão (`banco/.secret_key`) são criados sozinhos na primeira execução, **já com os 39 produtos iniciais** e o estoque de partida. Os dados **não são apagados** ao reiniciar o servidor. Esses dois arquivos não vão para o GitHub.
+- O banco (`banco/saboreal.db`) e a chave de sessão (`banco/.secret_key`) são criados sozinhos na primeira execução, **já com os produtos iniciais** e o estoque de partida. Os dados **não são apagados** ao reiniciar o servidor. Esses dois arquivos não vão para o GitHub.
 - Se o sistema avisar que o banco está em **formato antigo**, apague o `banco/saboreal.db` e rode de novo. A implantação do formato anterior (um único saldo) é atualizada automaticamente.
 
 ### Primeiro acesso (saldos iniciais)
@@ -29,17 +29,9 @@ Os dois valores são registrados **uma única vez** (não podem ser alterados) e
 
 ### Reiniciar o banco / entregar ao cliente (modo limpo)
 
-Depois de testar, deixe o sistema pronto para uso real. A restauração apaga vendas, saídas, caixas, produtos e os saldos iniciais informados, e recria os 39 produtos iniciais com o estoque de partida (os usuários e a senha são mantidos). No próximo login, o gerente informa os saldos iniciais reais. Três formas:
-
-- **Pela tela:** entre como gerente, vá em **Relatórios** e use **Restaurar sistema para uso real** (pede a senha).
-- **Pelo terminal:** `python back/app.py --restaurar-fabrica` (pede para digitar `RESTAURAR`).
-- **Apagando o arquivo do banco** (zera também os usuários; a senha do admin volta a `1234`): pare o servidor, apague `banco/saboreal.db` (`Remove-Item banco\saboreal.db` no PowerShell; `rm banco/saboreal.db` no Linux/Mac) e inicie de novo. O banco é recriado do zero.
-
-Não há como desfazer: se quiser guardar uma cópia dos dados, copie o arquivo do banco antes.
-
-Estoque de partida (por produto): Biscoitos 50 · Doces 20 · Bolos 8 · Salgados 25 · Bebidas 15.
-A lista de produtos e preços está em `back/seed.py`.
-
+Para resetar o banco de dados e preparar o sistema para o uso real do cliente:
+- Pare o servidor, apague o arquivo `banco/saboreal.db` e inicie o servidor novamente. 
+- O banco será recriado do zero com os produtos iniciais e o estoque de partida. No primeiro login, o gerente informará os saldos iniciais reais.
 ### Trocar a senha do admin
 
 ```bash
@@ -66,8 +58,8 @@ Saboreal/
 │   ├── auth.py             # token de sessão e proteção das rotas
 │   ├── utils.py            # constantes, validações e erros padronizados
 │   ├── saldos.py           # regra única dos saldos (tela inicial e relatório)
-│   ├── seed.py             # os 39 produtos iniciais e a restauração de fábrica
-│   └── routes/             # autenticacao, implantacao, produtos, caixa, vendas, relatorios, admin
+│   ├── seed.py             # os produtos iniciais e povoamento inicial do banco
+│   └── routes/             # autenticacao, implantacao, produtos, caixa, vendas, relatorios,
 ├── banco/
 │   └── schema.sql          # tabelas (valores em centavos)
 └── front/
