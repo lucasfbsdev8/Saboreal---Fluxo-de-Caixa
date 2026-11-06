@@ -209,6 +209,11 @@ button:disabled { opacity: .55; cursor: not-allowed; }
 @media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
 
 /* ---------- 13. Filtro por categoria e tabela do fluxo de caixa ---------- */
+.chips { display: flex; flex-wrap: wrap; gap: 8px; margin: 12px 0; }
+.chip { border: 1px solid var(--marrom); background: #FFF; color: var(--marrom-escuro); padding: 6px 14px; border-radius: 20px; font-weight: 600; font-size: .9rem; cursor: pointer; }
+.chip:hover { background: #F5EFEC; }
+.chip.active { background: var(--marrom-escuro); border-color: var(--marrom-escuro); color: #FFF; }
+
 .tabela-fluxo th, .tabela-fluxo td { min-width: 96px; }
 
 /* Coluna fixada na esquerda (Descrição/Categorias) */
