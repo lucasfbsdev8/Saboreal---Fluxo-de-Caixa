@@ -40,14 +40,3 @@ def popular_produtos(conexao):
             'INSERT INTO produtos (codigo, nome, categoria, preco_venda, estoque) VALUES (?, ?, ?, ?, ?)',
             (f'{numero:02d}', nome, categoria, preco, ESTOQUE_INICIAL[categoria]),
         )
-
-
-def restaurar_fabrica(conexao):
-    """Apaga vendas, saídas, caixas e produtos e recria os produtos iniciais. Mantém os usuários."""
-    for tabela in ('itens_venda', 'vendas', 'movimentacoes_caixa', 'caixa', 'produtos', 'implantacao'):
-        conexao.execute(f'DELETE FROM {tabela}')
-    conexao.execute(
-        "DELETE FROM sqlite_sequence WHERE name IN ('itens_venda', 'vendas', 'movimentacoes_caixa', 'caixa')"
-    )
-    popular_produtos(conexao)
-    conexao.commit()

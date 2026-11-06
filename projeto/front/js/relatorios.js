@@ -143,19 +143,6 @@ async function carregarMovimentacoes() {
         : '';
 }
 
-/* ---------- Restauração de fábrica ---------- */
-async function restaurarSistema() {
-    const senha = await pedirSenha(
-        'Isso apaga TODAS as vendas, saídas, caixas e produtos, e recria os 39 produtos iniciais com o estoque de partida.\nDigite sua senha para confirmar.',
-        { textoOk: 'Restaurar', perigo: true }
-    );
-    if (senha === null) return;
-    const res = await apiRequest('/admin/restaurar-fabrica', 'POST', { senha });
-    if (res?.sucesso) {
-        toast('Sistema restaurado e pronto para uso.', 'sucesso');
-        setTimeout(() => { location.href = 'inicio.html'; }, 1200);
-    }
-}
 
 document.addEventListener('DOMContentLoaded', () => {
     const agora = new Date();
@@ -179,11 +166,6 @@ document.addEventListener('DOMContentLoaded', () => {
     
     if ($('btn-filtrar-mov')) {
         $('btn-filtrar-mov').addEventListener('click', carregarMovimentacoes);
-    }
-
-    if (typeof Sessao !== 'undefined' && Sessao.cargo() === 'GERENTE') {
-        if ($('area-gerente')) $('area-gerente').hidden = false;
-        if ($('btn-restaurar')) $('btn-restaurar').addEventListener('click', restaurarSistema);
     }
     
     mostrarAba(new URLSearchParams(location.search).get('aba') || 'fluxo');
